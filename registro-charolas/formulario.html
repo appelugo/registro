@@ -30,8 +30,6 @@
             --dominos: #00A5B0;
             --starbucks: #006241;
             --warning: #F39C12;
-            --orange: #F39C12;
-            --orange-dark: #E67E22;
             --border-radius: 10px;
             --box-shadow: 0 4px 12px rgba(10, 35, 66, 0.06);
         }
@@ -155,10 +153,19 @@
             border-left: 4px solid var(--danger);
         }
 
-        .form-group input.error {
-            border-left: 4px solid var(--danger);
-            border-color: var(--danger);
-            background-color: rgba(231, 76, 60, 0.05);
+        /* ============================================ */
+        /* VALIDACIÓN DE TIENDAS - COLORES             */
+        /* ============================================ */
+        input.valido {
+            border-left: 4px solid #27AE60 !important;
+            border-color: #27AE60 !important;
+            background-color: rgba(39, 174, 96, 0.05) !important;
+        }
+
+        input.error {
+            border-left: 4px solid #E74C3C !important;
+            border-color: #E74C3C !important;
+            background-color: rgba(231, 76, 60, 0.05) !important;
         }
 
         .comentario-group {
@@ -274,14 +281,14 @@
         }
 
         /* ============================================ */
-        /* BOTÓN ORGANIGRAMA - VISIBLE Y FUNCIONAL     */
+        /* BOTÓN ORGANIGRAMA                            */
         /* ============================================ */
         .btn-organigrama {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            background: #F39C12;  /* Color naranja sólido */
+            background: #F39C12;
             color: white;
             font-weight: 600;
             font-size: 0.85rem;
@@ -789,7 +796,7 @@
                 </div>
                 
                 <div class="button-group">
-                    <!-- BOTÓN ORGANIGRAMA CON CLASE ESPECÍFICA -->
+                    <!-- BOTÓN ORGANIGRAMA -->
                     <button class="btn-organigrama" onclick="abrirModalOrganigrama()">
                         📋 Organigrama
                     </button>
@@ -1009,31 +1016,35 @@
         }
 
         // ============================================
-        // VALIDAR TIENDA EN TIEMPO REAL
+        // ✅ VALIDAR TIENDA CON COLORES
         // ============================================
         function validarTienda(input) {
             const tienda = input.value.trim();
-            const fila = input.closest('tr');
             
             if (!tienda) {
+                // Campo vacío - sin color
+                input.classList.remove('valido');
                 input.classList.remove('error');
                 return true;
             }
 
             const existe = listaCECOs.includes(tienda);
             
-            if (!existe) {
-                input.classList.add('error');
-                mostrarToast('⚠️ La tienda no existe', '#E74C3C');
-                return false;
-            } else {
+            if (existe) {
+                // ✅ VÁLIDO - Verde
+                input.classList.add('valido');
                 input.classList.remove('error');
                 return true;
+            } else {
+                // ❌ NO VÁLIDO - Rojo
+                input.classList.add('error');
+                input.classList.remove('valido');
+                return false;
             }
         }
 
         // ============================================
-        // FUNCIONES DE TABLA (modificadas para incluir validación)
+        // FUNCIONES DE TABLA
         // ============================================
         function inicializarTabla(cantidad) {
             const tbody = document.getElementById('tablaBody');
@@ -1388,7 +1399,6 @@
 
                 await db.collection('registros').doc(idUnico).set(formularioCompleto);
                 
-                // También guardar en localStorage como respaldo
                 let repositorio = JSON.parse(localStorage.getItem('repositorioCharolas')) || [];
                 repositorio.unshift(formularioCompleto);
                 localStorage.setItem('repositorioCharolas', JSON.stringify(repositorio));
