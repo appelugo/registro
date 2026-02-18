@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - Registro Charolas</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <style>
+        body { font-family: Arial; background: #f0f0f0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 350px; }
+        h2 { text-align: center; color: #0A2342; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+        button { width: 100%; padding: 10px; background: #0A2342; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 5px 0; }
+        button:hover { background: #1E3A4F; }
+        .error { color: red; font-size: 0.9rem; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🔐 Acceso a Ventanilla</h2>
+        <div id="errorMsg" class="error"></div>
+        <input type="email" id="email" placeholder="Correo electrónico">
+        <input type="password" id="password" placeholder="Contraseña">
+        <button onclick="iniciarSesion()">INICIAR SESIÓN</button>
+        <button onclick="registrarUsuario()">REGISTRARSE</button>
+        <p style="text-align:center; margin-top:15px;">
+            <a href="ventanilla.html" style="color:#4A89C5;">← Volver a Ventanilla</a>
+        </p>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDD0lCq8rAnCm2KjsqSwzxlpUhQU2gRVfk",
+            authDomain: "registro-charolas.firebaseapp.com",
+            projectId: "registro-charolas",
+            storageBucket: "registro-charolas.firebasestorage.app",
+            messagingSenderId: "105080206085",
+            appId: "1:105080206085:web:443ba22aaf8cbcea767d6c"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        function mostrarError(texto) {
+            document.getElementById('errorMsg').textContent = texto;
+        }
+
+        function iniciarSesion() {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('password').value;
+            if (!email || !pass) {
+                mostrarError('Completa todos los campos');
+                return;
+            }
+            auth.signInWithEmailAndPassword(email, pass)
+                .then(() => window.location.href = 'ventanilla.html')
+                .catch(error => mostrarError(error.message));
+        }
+
+        function registrarUsuario() {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('password').value;
+            if (!email || !pass) {
+                mostrarError('Completa todos los campos');
+                return;
+            }
+            auth.createUserWithEmailAndPassword(email, pass)
+                .then(() => alert('Usuario registrado. Ya puedes iniciar sesión.'))
+                .catch(error => mostrarError(error.message));
+        }
+    </script>
+</body>
+</html>
