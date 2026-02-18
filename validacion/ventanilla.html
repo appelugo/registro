@@ -27,15 +27,15 @@
             --success: #27AE60;
             --danger: #E74C3C;
             --warning: #F39C12;
-            --border-radius: 10px;
-            --box-shadow: 0 4px 12px rgba(10, 35, 66, 0.06);
+            --border-radius: 8px;
+            --box-shadow: 0 2px 8px rgba(10, 35, 66, 0.08);
         }
 
         body {
             background-color: var(--gray);
             color: var(--text-dark);
-            line-height: 1.4;
-            padding: 20px;
+            line-height: 1.3;
+            padding: 15px;
             min-height: 100vh;
         }
 
@@ -45,23 +45,36 @@
             background-color: var(--white);
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
-            padding: 25px;
+            padding: 20px;
         }
 
+        /* ============================================ */
+        /* HEADER COMPACTO                              */
+        /* ============================================ */
         .header {
             display: flex;
-            flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 3px solid var(--accent);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-small {
+            height: 40px;
+            width: auto;
         }
 
         .header h1 {
             color: var(--primary);
             font-weight: 600;
-            font-size: 1.8rem;
+            font-size: 1.4rem;
             margin: 0;
         }
 
@@ -70,14 +83,33 @@
             font-weight: 300;
         }
 
-        .btn {
-            padding: 8px 18px;
-            border: none;
-            border-radius: 8px;
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background-color: var(--light);
+            padding: 6px 14px;
+            border-radius: 30px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .user-email {
             font-weight: 600;
-            font-size: 0.8rem;
+            color: var(--primary);
+            font-size: 0.85rem;
+        }
+
+        /* ============================================ */
+        /* BOTONES                                      */
+        /* ============================================ */
+        .btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
+            letter-spacing: 0.5px;
             cursor: pointer;
             transition: all 0.2s;
             display: inline-flex;
@@ -94,7 +126,6 @@
 
         .btn-primary:hover {
             background-color: #0D2B4A;
-            transform: translateY(-1px);
         }
 
         .btn-success {
@@ -104,7 +135,6 @@
 
         .btn-success:hover {
             background-color: #219A53;
-            transform: translateY(-1px);
         }
 
         .btn-danger {
@@ -114,17 +144,6 @@
 
         .btn-danger:hover {
             background-color: #C0392B;
-            transform: translateY(-1px);
-        }
-
-        .btn-info {
-            background-color: var(--accent);
-            color: white;
-        }
-
-        .btn-info:hover {
-            background-color: #3A7AB0;
-            transform: translateY(-1px);
         }
 
         .btn-warning {
@@ -134,184 +153,200 @@
 
         .btn-warning:hover {
             background-color: #E67E22;
-            transform: translateY(-1px);
         }
 
-        .btn-secondary {
-            background-color: var(--secondary);
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background-color: #1E3A4F;
-            transform: translateY(-1px);
-        }
-
-        .busqueda-section {
+        /* ============================================ */
+        /* FORMULARIO COMPACTO - 6 COLUMNAS             */
+        /* ============================================ */
+        .form-compacto {
             background: linear-gradient(to right, var(--light), var(--white));
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
             border: 1px solid rgba(74, 137, 197, 0.15);
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            align-items: center;
+        }
+
+        .campo-group {
             display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
+            flex-direction: column;
+        }
+
+        .campo-group label {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 2px;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .campo-group input, 
+        .campo-group .valor {
+            padding: 6px 10px;
+            border: 1.5px solid var(--gray);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            background-color: var(--white);
+            height: 34px;
+        }
+
+        .campo-group .valor {
+            background-color: #F0F4F8;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+        }
+
+        /* Grupo de búsqueda especial */
+        .busqueda-group {
+            display: flex;
+            gap: 5px;
             align-items: flex-end;
         }
 
-        .busqueda-group {
-            flex: 2;
-            min-width: 250px;
+        .busqueda-group .campo-group {
+            flex: 1;
         }
 
-        .busqueda-group label {
+        .btn-lupa {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+            margin-bottom: 0;
+        }
+
+        .btn-lupa:hover {
+            background-color: #3A7AB0;
+            transform: translateY(-1px);
+        }
+
+        /* ============================================ */
+        /* CAMPO DE COMENTARIOS - ANCHO COMPLETO        */
+        /* ============================================ */
+        .comentario-full {
+            grid-column: 1 / -1;
+            margin-top: 5px;
+        }
+
+        .comentario-full label {
             font-weight: 600;
             color: var(--primary);
-            margin-bottom: 3px;
-            font-size: 0.75rem;
+            margin-bottom: 2px;
+            font-size: 0.65rem;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             display: block;
         }
 
-        .busqueda-group input {
+        .comentario-full input {
             width: 100%;
-            padding: 12px 16px;
+            padding: 8px 12px;
             border: 1.5px solid var(--gray);
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.2s;
+            border-radius: 6px;
+            font-size: 0.85rem;
             background-color: var(--white);
+            height: 38px;
         }
 
-        .busqueda-group input:focus {
+        .comentario-full input:focus {
             outline: none;
             border-color: var(--accent);
             box-shadow: 0 0 0 2px rgba(74, 137, 197, 0.1);
         }
 
-        .datos-generales {
-            background-color: var(--light);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            border: 1px solid var(--gray);
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-
-        .campo-lectura {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .campo-lectura label {
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 3px;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .campo-lectura .valor {
-            padding: 10px 14px;
-            background-color: var(--white);
-            border: 1.5px solid var(--gray);
-            border-radius: 8px;
-            font-size: 0.95rem;
-            color: var(--text-dark);
-        }
-
-        .campo-editable {
-            display: flex;
-            flex-direction: column;
-            grid-column: span 2;
-        }
-
-        .campo-editable label {
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 3px;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .campo-editable textarea {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1.5px solid var(--gray);
-            border-radius: 8px;
-            font-size: 0.95rem;
-            transition: all 0.2s;
-            background-color: var(--white);
-            resize: vertical;
-            min-height: 80px;
-            font-family: inherit;
-        }
-
-        .campo-editable textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(74, 137, 197, 0.1);
-        }
-
+        /* ============================================ */
+        /* TABLA                                        */
+        /* ============================================ */
         .tabla-section {
-            margin-top: 20px;
+            margin-top: 15px;
         }
 
         .tabla-section h3 {
             color: var(--primary);
-            margin-bottom: 15px;
-            font-size: 1.2rem;
+            margin-bottom: 10px;
+            font-size: 1rem;
+            font-weight: 600;
         }
 
         .table-responsive {
             overflow-x: auto;
-            border-radius: 10px;
+            border-radius: 8px;
             border: 1px solid var(--gray);
-            margin-bottom: 20px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 800px;
+            min-width: 700px;
         }
 
         th {
             background-color: var(--primary);
             color: var(--white);
-            padding: 12px 10px;
-            font-size: 0.8rem;
+            padding: 8px 6px;
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             text-align: center;
         }
 
         td {
-            padding: 10px;
+            padding: 6px;
             border-bottom: 1px solid var(--gray);
             text-align: center;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
         }
 
-        .estado-error {
-            background-color: rgba(231, 76, 60, 0.1);
+        .badge {
+            padding: 3px 8px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            display: inline-block;
         }
 
+        .badge-dominos {
+            background-color: rgba(0, 165, 176, 0.1);
+            color: #00A5B0;
+            border: 1px solid #00A5B0;
+        }
+
+        .badge-starbucks {
+            background-color: rgba(0, 98, 65, 0.1);
+            color: #006241;
+            border: 1px solid #006241;
+        }
+
+        /* ============================================ */
+        /* MENSAJES                                      */
+        /* ============================================ */
         .mensaje-error {
             color: var(--danger);
-            font-size: 0.85rem;
-            margin-top: 10px;
-            padding: 10px;
+            font-size: 0.8rem;
+            margin: 10px 0;
+            padding: 8px;
             background-color: rgba(231, 76, 60, 0.05);
-            border-radius: 8px;
+            border-radius: 6px;
             border-left: 4px solid var(--danger);
         }
 
+        /* ============================================ */
+        /* LOADER                                       */
+        /* ============================================ */
         .loader-overlay {
             position: fixed;
             top: 0;
@@ -328,32 +363,23 @@
 
         .loader-container {
             background-color: white;
-            padding: 30px 40px;
-            border-radius: 16px;
+            padding: 20px 30px;
+            border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
-            animation: fadeIn 0.3s ease;
+            gap: 10px;
         }
 
         .loader-spinner {
-            width: 60px;
-            height: 60px;
-            border: 6px solid var(--light);
-            border-top: 6px solid var(--accent);
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--light);
+            border-top: 4px solid var(--accent);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-        }
-
-        .loader-text {
-            color: var(--primary);
-            font-weight: 600;
-            font-size: 1.1rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         @keyframes spin {
@@ -361,90 +387,84 @@
             100% { transform: rotate(360deg); }
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
         .footer {
-            margin-top: 20px;
+            margin-top: 15px;
             color: var(--secondary);
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             text-align: right;
             border-top: 1px solid var(--gray);
-            padding-top: 15px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background-color: var(--light);
-            padding: 8px 16px;
-            border-radius: 30px;
-            border-left: 4px solid var(--accent);
-        }
-
-        .user-email {
-            font-weight: 600;
-            color: var(--primary);
+            padding-top: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- HEADER CON LOGO -->
         <div class="header">
-            <h1>Ventanilla de <span>Validación</span></h1>
+            <div class="header-left">
+                <img src="logo.png" alt="Logo" class="logo-small" onerror="this.style.display='none'">
+                <h1>Ventanilla de <span>Validación</span></h1>
+            </div>
             <div class="user-info" id="userInfo" style="display: none;">
                 <span class="user-email" id="userEmail"></span>
-                <button class="btn btn-danger" onclick="cerrarSesion()">CERRAR SESIÓN</button>
+                <button class="btn btn-danger" onclick="cerrarSesion()">SALIR</button>
             </div>
-            <div id="loginButtons" style="display: flex; gap: 10px;">
-                <button class="btn btn-primary" onclick="window.location.href='login.html'">INICIAR SESIÓN</button>
-                <button class="btn btn-info" onclick="window.location.href='formulario.html'">VOLVER AL FORMULARIO</button>
+            <div id="loginButtons" style="display: flex; gap: 8px;">
+                <button class="btn btn-primary" onclick="window.location.href='login.html'">ACCEDER</button>
             </div>
         </div>
 
-        <!-- SECCIÓN DE BÚSQUEDA -->
-        <div class="busqueda-section">
-            <div class="busqueda-group">
-                <label>🔍 BUSCAR POR BITÁCORA</label>
-                <input type="text" id="buscarBitacora" placeholder="Ej: 265487" onkeypress="if(event.key==='Enter'){buscarRegistro();}">
+        <!-- FORMULARIO COMPACTO DE 6 COLUMNAS -->
+        <div class="form-compacto" id="formularioBusqueda">
+            <!-- Col 1: Búsqueda (2 columnas: input + lupa) -->
+            <div class="busqueda-group" style="grid-column: span 2;">
+                <div class="campo-group">
+                    <label>🔍 BITÁCORA</label>
+                    <input type="text" id="buscarBitacora" placeholder="Número de bitácora" onkeypress="if(event.key==='Enter'){buscarRegistro();}">
+                </div>
+                <button class="btn-lupa" onclick="buscarRegistro()">🔍</button>
             </div>
-            <button class="btn btn-success" onclick="buscarRegistro()" style="height: 48px;">BUSCAR</button>
+
+            <!-- Col 2: No. Empleado -->
+            <div class="campo-group">
+                <label>NO. EMPLEADO</label>
+                <div class="valor" id="verNoEmpleado">—</div>
+            </div>
+
+            <!-- Col 3: Ruta -->
+            <div class="campo-group">
+                <label>RUTA</label>
+                <div class="valor" id="verRuta">—</div>
+            </div>
+
+            <!-- Col 4: Bitácora -->
+            <div class="campo-group">
+                <label>BITÁCORA</label>
+                <div class="valor" id="verBitacora">—</div>
+            </div>
+
+            <!-- Col 5: Unidad -->
+            <div class="campo-group">
+                <label>UNIDAD</label>
+                <div class="valor" id="verUnidad">—</div>
+            </div>
+
+            <!-- Fila completa para comentarios (debajo de las 6 columnas) -->
+            <div class="comentario-full">
+                <label>✏️ COMENTARIOS</label>
+                <input type="text" id="editarComentarios" placeholder="Agrega un comentario si hay error...">
+            </div>
         </div>
 
-        <!-- MENSAJE DE ERROR / NO ENCONTRADO -->
+        <!-- BOTÓN VALIDAR (antes "Guardar comentario") -->
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
+            <button class="btn btn-warning" onclick="guardarComentario()" style="padding: 8px 25px;">✅ VALIDAR</button>
+        </div>
+
+        <!-- MENSAJE DE ERROR -->
         <div id="mensajeError" class="mensaje-error" style="display: none;"></div>
 
-        <!-- DATOS GENERALES (se muestran cuando hay un registro) -->
-        <div id="datosGeneralesSection" style="display: none;">
-            <div class="datos-generales">
-                <div class="campo-lectura">
-                    <label>No. EMPLEADO</label>
-                    <div class="valor" id="verNoEmpleado"></div>
-                </div>
-                <div class="campo-lectura">
-                    <label>RUTA</label>
-                    <div class="valor" id="verRuta"></div>
-                </div>
-                <div class="campo-lectura">
-                    <label>BITÁCORA</label>
-                    <div class="valor" id="verBitacora"></div>
-                </div>
-                <div class="campo-lectura">
-                    <label>UNIDAD</label>
-                    <div class="valor" id="verUnidad"></div>
-                </div>
-                <div class="campo-editable">
-                    <label>✏️ COMENTARIOS (EDITABLE)</label>
-                    <textarea id="editarComentarios" placeholder="Agrega un comentario si hay error..."></textarea>
-                </div>
-            </div>
-            <button class="btn btn-warning" onclick="guardarComentario()" style="margin-bottom: 20px;">💾 GUARDAR COMENTARIO</button>
-        </div>
-
-        <!-- TABLA DE TIENDAS (se muestra cuando hay un registro) -->
+        <!-- TABLA DE TIENDAS -->
         <div id="tablaSection" style="display: none;" class="tabla-section">
             <h3>📋 TIENDAS CAPTURADAS</h3>
             <div class="table-responsive">
@@ -478,7 +498,7 @@
 
     <script>
         // ============================================
-        // 🔥 CONFIGURACIÓN DE FIREBASE (TUS DATOS)
+        // 🔥 CONFIGURACIÓN DE FIREBASE
         // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyDD0lCq8rAnCm2KjsqSwzxlpUhQU2gRVfk",
@@ -493,45 +513,41 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // ============================================
-        // VARIABLES GLOBALES
-        // ============================================
         let registroActual = null;
         let documentoIdActual = null;
 
         // ============================================
-        // VERIFICAR ESTADO DE AUTENTICACIÓN
+        // VERIFICAR AUTENTICACIÓN
         // ============================================
         auth.onAuthStateChanged((user) => {
             if (user) {
-                // Usuario autenticado
                 document.getElementById('userInfo').style.display = 'flex';
                 document.getElementById('userEmail').textContent = user.email;
                 document.getElementById('loginButtons').style.display = 'none';
             } else {
-                // No autenticado
                 document.getElementById('userInfo').style.display = 'none';
                 document.getElementById('loginButtons').style.display = 'flex';
-                document.getElementById('datosGeneralesSection').style.display = 'none';
                 document.getElementById('tablaSection').style.display = 'none';
+                limpiarCampos();
             }
         });
 
-        // ============================================
-        // CERRAR SESIÓN
-        // ============================================
         function cerrarSesion() {
-            auth.signOut()
-                .then(() => {
-                    window.location.href = 'login.html';
-                })
-                .catch((error) => {
-                    alert('Error al cerrar sesión: ' + error.message);
-                });
+            auth.signOut().then(() => {
+                window.location.href = 'login.html';
+            });
+        }
+
+        function limpiarCampos() {
+            document.getElementById('verNoEmpleado').textContent = '—';
+            document.getElementById('verRuta').textContent = '—';
+            document.getElementById('verBitacora').textContent = '—';
+            document.getElementById('verUnidad').textContent = '—';
+            document.getElementById('editarComentarios').value = '';
         }
 
         // ============================================
-        // BUSCAR REGISTRO POR BITÁCORA
+        // BUSCAR REGISTRO
         // ============================================
         async function buscarRegistro() {
             const bitacora = document.getElementById('buscarBitacora').value.trim();
@@ -544,55 +560,44 @@
             mostrarLoader();
 
             try {
-                // Buscar en Firestore
                 const snapshot = await db.collection('registros')
                     .where('datosGenerales.bitacora', '==', bitacora)
                     .get();
 
                 if (snapshot.empty) {
                     ocultarLoader();
-                    mostrarError('❌ No se encontró ningún registro con la bitácora: ' + bitacora);
-                    document.getElementById('datosGeneralesSection').style.display = 'none';
+                    mostrarError('❌ No se encontró ningún registro');
                     document.getElementById('tablaSection').style.display = 'none';
+                    limpiarCampos();
                     registroActual = null;
                     documentoIdActual = null;
                     return;
                 }
 
-                // Tomar el primer resultado (debería ser único)
                 snapshot.forEach(doc => {
                     registroActual = doc.data();
                     documentoIdActual = doc.id;
                 });
 
-                // Mostrar los datos
                 mostrarRegistro(registroActual);
                 ocultarError();
 
             } catch (error) {
-                console.error('Error en búsqueda:', error);
-                mostrarError('❌ Error al buscar: ' + error.message);
+                mostrarError('❌ Error: ' + error.message);
             } finally {
                 ocultarLoader();
             }
         }
 
-        // ============================================
-        // MOSTRAR REGISTRO EN PANTALLA
-        // ============================================
         function mostrarRegistro(registro) {
-            // Datos generales
             document.getElementById('verNoEmpleado').textContent = registro.datosGenerales?.noEmpleado || 'S/N';
             document.getElementById('verRuta').textContent = registro.datosGenerales?.ruta || 'S/N';
             document.getElementById('verBitacora').textContent = registro.datosGenerales?.bitacora || 'S/N';
             document.getElementById('verUnidad').textContent = registro.datosGenerales?.unidad || 'S/N';
             document.getElementById('editarComentarios').value = registro.datosGenerales?.comentarios || '';
 
-            // Mostrar secciones
-            document.getElementById('datosGeneralesSection').style.display = 'block';
             document.getElementById('tablaSection').style.display = 'block';
 
-            // Generar tabla de tiendas
             const tbody = document.getElementById('tablaBody');
             tbody.innerHTML = '';
 
@@ -609,68 +614,38 @@
                     tbody.appendChild(fila);
                 });
             } else {
-                tbody.innerHTML = '<tr><td colspan="5">No hay tiendas en este registro</td></tr>';
-            }
-
-            // Agregar estilos de badge (si no existen)
-            if (!document.querySelector('#badgeStyles')) {
-                const style = document.createElement('style');
-                style.id = 'badgeStyles';
-                style.textContent = `
-                    .badge {
-                        padding: 4px 8px;
-                        border-radius: 50px;
-                        font-weight: 600;
-                        font-size: 0.7rem;
-                        text-transform: uppercase;
-                        display: inline-block;
-                    }
-                    .badge-dominos {
-                        background-color: rgba(0, 165, 176, 0.1);
-                        color: #00A5B0;
-                        border: 1px solid #00A5B0;
-                    }
-                    .badge-starbucks {
-                        background-color: rgba(0, 98, 65, 0.1);
-                        color: #006241;
-                        border: 1px solid #006241;
-                    }
-                `;
-                document.head.appendChild(style);
+                tbody.innerHTML = '<tr><td colspan="5">Sin tiendas</td></tr>';
             }
         }
 
         // ============================================
-        // GUARDAR COMENTARIO (SOLO COMENTARIO)
+        // VALIDAR (GUARDAR COMENTARIO)
         // ============================================
         async function guardarComentario() {
             if (!documentoIdActual) {
-                alert('❌ No hay ningún registro seleccionado');
+                alert('❌ No hay registro seleccionado');
                 return;
             }
 
             const comentario = document.getElementById('editarComentarios').value.trim();
             
-            mostrarLoader('Guardando comentario...');
+            mostrarLoader('Guardando...');
 
             try {
-                // Actualizar SOLO el campo comentarios
                 await db.collection('registros').doc(documentoIdActual).update({
                     'datosGenerales.comentarios': comentario || 'S/N'
                 });
 
                 ocultarLoader();
-                alert('✅ Comentario guardado correctamente');
+                alert('✅ Comentario validado correctamente');
 
-                // Actualizar el objeto local
                 if (registroActual) {
                     registroActual.datosGenerales.comentarios = comentario || 'S/N';
                 }
 
             } catch (error) {
                 ocultarLoader();
-                console.error('Error al guardar comentario:', error);
-                alert('❌ Error al guardar: ' + error.message);
+                alert('❌ Error: ' + error.message);
             }
         }
 
@@ -687,9 +662,8 @@
         }
 
         function mostrarError(mensaje) {
-            const errorDiv = document.getElementById('mensajeError');
-            errorDiv.textContent = mensaje;
-            errorDiv.style.display = 'block';
+            document.getElementById('mensajeError').textContent = mensaje;
+            document.getElementById('mensajeError').style.display = 'block';
         }
 
         function ocultarError() {
