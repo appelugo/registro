@@ -944,8 +944,8 @@
             document.getElementById('fileOrganigrama').value = '';
         }
 
-        // ============================================
-// PROCESAR ARCHIVO EXCEL - GUARDA TODAS LAS COLUMNAS
+// ============================================
+// PROCESAR ARCHIVO EXCEL - CON VISTA PREVIA
 // ============================================
 async function procesarOrganigrama() {
     const fileInput = document.getElementById('fileOrganigrama');
@@ -1022,22 +1022,60 @@ async function procesarOrganigrama() {
                 }
             }
 
-            actualizarLoaderMensaje(`Guardando ${datosCompletos.length} registros en Firebase...`);
-
-            // 🔥 GUARDAR EN FIREBASE (REEMPLAZANDO DATOS ANTERIORES)
-            await db.collection('organigrama').doc('lista_cecos').set({
-                cecos: cecos,
-                datosCompletos: datosCompletos,
-                fecha_actualizacion: new Date().toLocaleString(),
-                total: datosCompletos.length
-            });
-
-            // Actualizar lista local
-            listaCECOs = cecos;
-
+            // ============================================
+            // VISTA PREVIA - Mostrar primeros 5 registros
+            // ============================================
             ocultarLoader();
-            alert(`✅ Organigrama cargado con ${datosCompletos.length} registros`);
-            cerrarModalOrganigrama();
+            
+            // Crear mensaje de vista previa
+            let mensajePreview = `📋 **VISTA PREVIA DEL ORGANIGRAMA**\n\n`;
+            mensajePreview += `Total de registros: ${datosCompletos.length}\n`;
+            mensajePreview += `Columnas detectadas:\n`;
+            mensajePreview += `- CEDIS: ${columnas.CEDIS !== -1 ? '✓' : '✗'}\n`;
+            mensajePreview += `- MARCA: ${columnas.MARCA !== -1 ? '✓' : '✗'}\n`;
+            mensajePreview += `- CECO: ✓\n`;
+            mensajePreview += `- STATUS: ${columnas.STATUS !== -1 ? '✓' : '✗'}\n`;
+            mensajePreview += `- TIENDA: ${columnas.TIENDA !== -1 ? '✓' : '✗'}\n`;
+            mensajePreview += `- TIPO UNIDAD: ${columnas.TIPO_UNIDAD !== -1 ? '✓' : '✗'}\n`;
+            mensajePreview += `- ESTADO: ${columnas.ESTADO !== -1 ? '✓' : '✗'}\n\n`;
+            
+            mensajePreview += `**PRIMEROS 5 REGISTROS:**\n`;
+            
+            for (let i = 0; i < Math.min(5, datosCompletos.length); i++) {
+                const reg = datosCompletos[i];
+                mensajePreview += `\n${i+1}. CECO: ${reg.ceco}\n`;
+                if (reg.cedis) mensajePreview += `   CEDIS: ${reg.cedis}\n`;
+                if (reg.marca) mensajePreview += `   MARCA: ${reg.marca}\n`;
+                if (reg.status) mensajePreview += `   STATUS: ${reg.status}\n`;
+                if (reg.tienda) mensajePreview += `   TIENDA: ${reg.tienda}\n`;
+                if (reg.tipoUnidad) mensajePreview += `   TIPO UNIDAD: ${reg.tipoUnidad}\n`;
+                if (reg.estado) mensajePreview += `   ESTADO: ${reg.estado}\n`;
+            }
+
+            // Preguntar al usuario si desea continuar
+            if (confirm(mensajePreview + '\n\n¿Los datos son correctos? Presiona OK para guardar en Firebase.')) {
+                
+                mostrarLoader(`Guardando ${datosCompletos.length} registros en Firebase...`);
+
+                // 🔥 GUARDAR EN FIREBASE (REEMPLAZANDO DATOS ANTERIORES)
+                await db.collection('organigrama').doc('lista_cecos').set({
+                    cecos: cecos,
+                    datosCompletos: datosCompletos,
+                    fecha_actualizacion: new Date().toLocaleString(),
+                    total: datosCompletos.length
+                });
+
+                // Actualizar lista local
+                listaCECOs = cecos;
+
+                ocultarLoader();
+                alert(`✅ Organigrama cargado exitosamente con ${datosCompletos.length} registros`);
+                cerrarModalOrganigrama();
+                
+            } else {
+                // Usuario canceló
+                alert('❌ Carga cancelada. Revisa el archivo e inténtalo de nuevo.');
+            }
 
         } catch (error) {
             ocultarLoader();
@@ -1048,7 +1086,6 @@ async function procesarOrganigrama() {
 
     reader.readAsArrayBuffer(file);
 }
-
         // ============================================
         // ✅ VALIDAR TIENDA CON COLORES
         // ============================================
@@ -1479,4 +1516,5 @@ async function procesarOrganigrama() {
     </script>
 </body>
 </html>
+
 
