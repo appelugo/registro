@@ -108,7 +108,7 @@
             border-left: 4px solid var(--accent);
         }
 
-        .user-email {
+        .user-empleado {
             font-weight: 600;
             color: var(--primary);
             font-size: 0.8rem;
@@ -141,7 +141,44 @@
         }
 
         /* ============================================ */
-        /* FORMULARIO PRINCIPAL - UNA FILA              */
+        /* BOTONES                                       */
+        /* ============================================ */
+        .btn {
+            padding: 4px 10px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0D2B4A;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #C0392B;
+        }
+
+        /* ============================================ */
+        /* FORMULARIO PRINCIPAL                          */
         /* ============================================ */
         .form-principal {
             background: linear-gradient(to right, var(--light), var(--white));
@@ -214,7 +251,14 @@
             margin: 0;
         }
 
-        /* Buscador integrado en la fila */
+        .campo-group input:disabled,
+        .campo-group .valor:disabled {
+            background-color: #F0F4F8;
+            color: var(--text-dark);
+            border-color: #D5DBDB;
+        }
+
+        /* Buscador integrado */
         .busqueda-integrada {
             display: flex;
             gap: 3px;
@@ -251,18 +295,12 @@
             cursor: not-allowed;
         }
 
-        /* Fila de comentarios (ancho completo) */
+        /* Fila de comentarios */
         .fila-comentario {
             margin-top: 6px;
-        }
-
-        .fila-comentario .campo-group {
-            width: 100%;
-        }
-
-        .fila-comentario input {
-            width: 100%;
-            height: 32px;
+            display: grid;
+            grid-template-columns: 0.9fr 3fr;
+            gap: 6px;
         }
 
         /* ============================================ */
@@ -441,7 +479,7 @@
                 </div>
                 <div class="header-derecha">
                     <div class="user-info" id="userInfo" style="display: none;">
-                        <span class="user-email" id="userEmpleado"></span>
+                        <span class="user-empleado" id="userEmpleado"></span>
                         <button class="btn btn-danger" onclick="cerrarSesion()">SALIR</button>
                     </div>
                     <div id="loginButtons" style="display: flex; gap: 6px;">
@@ -451,11 +489,11 @@
                 </div>
             </div>
 
-            <!-- FORMULARIO PRINCIPAL - UNA FILA DE CAMPOS -->
+            <!-- FORMULARIO PRINCIPAL -->
             <div class="form-principal">
-                <!-- Primera fila: 7 columnas (buscador + 6 campos) -->
+                <!-- Primera fila: 7 columnas -->
                 <div class="fila-campos">
-                    <!-- Buscador integrado (col 1) -->
+                    <!-- Buscador integrado -->
                     <div class="busqueda-integrada">
                         <div class="campo-group">
                             <label>🔍 BITÁCORA</label>
@@ -464,45 +502,45 @@
                         <button class="btn-lupa" id="btnBuscar" onclick="buscarRegistro()">🔍</button>
                     </div>
 
-                    <!-- VALIDADOR (col 2) -->
+                    <!-- VALIDADOR -->
                     <div class="campo-group">
                         <label>VALIDADOR</label>
                         <input type="text" id="validador" placeholder="Validador">
                     </div>
 
-                    <!-- TRANSPORTE (col 3) -->
+                    <!-- TRANSPORTE -->
                     <div class="campo-group">
                         <label>TRANSPORTE</label>
                         <input type="text" id="transporte" placeholder="Transporte">
                     </div>
 
-                    <!-- CHECKBOX en columna (col 4) -->
+                    <!-- CHECKBOX en columna -->
                     <div class="campo-group check-group">
                         <label><input type="checkbox" id="firmada" checked> FIRMADA</label>
                         <label><input type="checkbox" id="sellada" checked> SELLADA</label>
                     </div>
 
-                    <!-- FECHA (col 5) -->
+                    <!-- FECHA -->
                     <div class="campo-group">
                         <label>FECHA</label>
                         <input type="date" id="fechaBitacora">
                     </div>
 
-                    <!-- NO. OPERADOR (col 6) -->
+                    <!-- NO. OPERADOR -->
                     <div class="campo-group">
                         <label>OPERADOR</label>
                         <input type="text" id="noOperador" placeholder="Operador">
                     </div>
 
-                    <!-- NO. VIAJE (col 7) -->
+                    <!-- NO. VIAJE -->
                     <div class="campo-group">
                         <label>VIAJE</label>
                         <input type="text" id="noViaje" placeholder="Viaje">
                     </div>
                 </div>
 
-                <!-- Segunda fila: BOLETA + COMENTARIOS (ancho completo) -->
-                <div class="fila-comentario" style="display: grid; grid-template-columns: 0.9fr 3fr; gap: 6px;">
+                <!-- Segunda fila: BOLETA + COMENTARIOS -->
+                <div class="fila-comentario">
                     <div class="campo-group">
                         <label>BOLETA</label>
                         <input type="text" id="boleta" placeholder="Boleta">
@@ -547,7 +585,7 @@
                 </div>
             </div>
 
-            <!-- TABLA DE TIENDAS CON REMISIÓN Y COMPLEMENTO EDITABLES -->
+            <!-- TABLA DE TIENDAS -->
             <div id="tablaSection" style="display: none;" class="tabla-section">
                 <h3>📋 VALIDACIÓN DE TIENDAS</h3>
                 <div class="table-responsive">
@@ -555,8 +593,8 @@
                         <thead>
                             <tr>
                                 <th>CECO</th>
-                                <th>NOMBRE TIENDA</th>
                                 <th>MARCA</th>
+                                <th>NOMBRE TIENDA</th>
                                 <th>REMISIÓN</th>
                                 <th>COMPLEMENTO</th>
                                 <th>CANTIDAD</th>
@@ -603,16 +641,17 @@
 
         let registroActual = null;
         let documentoIdActual = null;
-        let datosOrganigrama = []; // Guardará { ceco, marca, nombreTienda }
-        let esModoEdicion = true;   // Si está validado, se bloquea
+        let datosOrganigrama = [];
+        let esModoEdicion = true;
 
         // ============================================
-        // VERIFICAR AUTENTICACIÓN
+        // VERIFICAR AUTENTICACIÓN - CORREGIDO
         // ============================================
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 document.getElementById('userInfo').style.display = 'flex';
                 
+                // Buscar el empleado asociado al email
                 try {
                     const snapshot = await db.collection('usuarios')
                         .where('email', '==', user.email)
@@ -620,12 +659,15 @@
                     
                     if (!snapshot.empty) {
                         snapshot.forEach(doc => {
+                            // Mostrar el número de empleado
                             document.getElementById('userEmpleado').textContent = doc.data().empleado || user.email;
                         });
                     } else {
+                        // Si no encuentra por email, mostrar el email
                         document.getElementById('userEmpleado').textContent = user.email;
                     }
                 } catch (e) {
+                    console.log('Error buscando usuario:', e);
                     document.getElementById('userEmpleado').textContent = user.email;
                 }
                 
@@ -654,6 +696,8 @@
                     const data = snapshot.data();
                     datosOrganigrama = data.datosCompletos || [];
                     console.log(`✅ Organigrama cargado: ${datosOrganigrama.length} registros`);
+                } else {
+                    console.log('⚠️ No hay organigrama cargado');
                 }
             } catch (error) {
                 console.error('Error cargando organigrama:', error);
@@ -661,17 +705,28 @@
         }
 
         // ============================================
-        // OBTENER DATOS DE TIENDA POR CECO
+        // OBTENER DATOS DE TIENDA POR CECO - CORREGIDO
         // ============================================
         function obtenerDatosTienda(ceco) {
             if (!datosOrganigrama || datosOrganigrama.length === 0) {
+                console.log('⚠️ Organigrama no disponible');
                 return { nombre: '', marca: '' };
             }
-            const tienda = datosOrganigrama.find(t => t.ceco === ceco);
-            return {
-                nombre: tienda?.tienda || tienda?.nombreTienda || '',
-                marca: tienda?.marca || ''
-            };
+            
+            // Convertir a string para comparación segura
+            const cecoStr = String(ceco).trim();
+            const tienda = datosOrganigrama.find(t => String(t.ceco).trim() === cecoStr);
+            
+            if (tienda) {
+                console.log('✅ Tienda encontrada:', tienda);
+                return {
+                    nombre: tienda.tienda || '',    // Campo correcto: 'tienda' (columna E)
+                    marca: tienda.marca || ''        // Campo 'marca' (columna B)
+                };
+            } else {
+                console.log('❌ Tienda no encontrada para CECO:', ceco);
+                return { nombre: '', marca: '' };
+            }
         }
 
         // ============================================
@@ -748,7 +803,7 @@
         }
 
         // ============================================
-        // MOSTRAR REGISTRO
+        // MOSTRAR REGISTRO - CORREGIDO
         // ============================================
         function mostrarRegistro(registro) {
             document.getElementById('verNoEmpleado').textContent = registro.datosGenerales?.noEmpleado || 'S/N';
@@ -768,13 +823,21 @@
                     
                     const fila = document.createElement('tr');
                     
-                    // Valores previos de remisión y complemento si existen
+                    // Determinar clase del badge según marca
+                    let badgeClass = '';
+                    if (datos.marca.toUpperCase().includes('DOMINO')) {
+                        badgeClass = 'badge-dominos';
+                    } else if (datos.marca.toUpperCase().includes('STARBUCKS')) {
+                        badgeClass = 'badge-starbucks';
+                    }
+                    
+                    // Valores previos de remisión y complemento
                     const remisionPrev = (registro.validacion?.tiendas && registro.validacion.tiendas[index]?.remision) || '';
                     const complementoPrev = (registro.validacion?.tiendas && registro.validacion.tiendas[index]?.complemento) || '';
                     
                     fila.innerHTML = `
                         <td>${tienda.tienda || ''}</td>
-                        <td><span class="badge ${datos.marca === 'DOMINOS' ? 'badge-dominos' : 'badge-starbucks'}">${datos.marca || ''}</span></td>
+                        <td><span class="badge ${badgeClass}">${datos.marca || ''}</span></td>
                         <td><span class="texto-tabla">${datos.nombre || ''}</span></td>
                         <td><input type="text" class="table-input" value="${remisionPrev}" placeholder="Remisión" id="remision_${index}" ${!esModoEdicion ? 'disabled' : ''}></td>
                         <td><input type="text" class="table-input" value="${complementoPrev}" placeholder="Complemento" id="complemento_${index}" ${!esModoEdicion ? 'disabled' : ''}></td>
@@ -821,7 +884,7 @@
             mostrarLoader('Guardando validación...');
 
             try {
-                // Recolectar remisiones y complementos de la tabla
+                // Recolectar remisiones y complementos
                 const tiendasValidacion = [];
                 const filas = document.querySelectorAll('#tablaBody tr');
                 
