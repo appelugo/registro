@@ -384,54 +384,56 @@
         }
 
         // ============================================
-        // REGISTRAR USUARIO
-        // ============================================
-        async function registrarUsuario() {
-            const empleado = document.getElementById('regEmpleado').value.trim();
-            const password = document.getElementById('regPassword').value.trim();
-            const nombre = document.getElementById('regNombre').value.trim();
-            const mensajeDiv = document.getElementById('regMensaje');
+// REGISTRAR USUARIO (debe tener campo 'nombre')
+// ============================================
+async function registrarUsuario() {
+    const empleado = document.getElementById('regEmpleado').value.trim();
+    const password = document.getElementById('regPassword').value.trim();
+    const nombre = document.getElementById('regNombre').value.trim();
+    const mensajeDiv = document.getElementById('regMensaje');
 
-            if (!empleado) {
-                mensajeDiv.innerHTML = '<span style="color: #E74C3C;">❌ Empleado obligatorio</span>';
-                return;
-            }
+    if (!empleado) {
+        mensajeDiv.innerHTML = '<span style="color: #E74C3C;">❌ Empleado obligatorio</span>';
+        return;
+    }
 
-            if (!password || password.length < 4) {
-                mensajeDiv.innerHTML = '<span style="color: #E74C3C;">❌ Contraseña (mínimo 4 caracteres)</span>';
-                return;
-            }
+    if (!password || password.length < 4) {
+        mensajeDiv.innerHTML = '<span style="color: #E74C3C;">❌ Contraseña (mínimo 4 caracteres)</span>';
+        return;
+    }
 
-            mensajeDiv.innerHTML = '<span style="color: #666;">⏳ Verificando...</span>';
+    mensajeDiv.innerHTML = '<span style="color: #666;">⏳ Verificando...</span>';
 
-            try {
-                const snapshot = await db.collection('usuarios')
-                    .where('empleado', '==', empleado)
-                    .get();
+    try {
+        const snapshot = await db.collection('usuarios')
+            .where('empleado', '==', empleado)
+            .get();
 
-                if (!snapshot.empty) {
-                    mensajeDiv.innerHTML = '<span style="color: #E74C3C;">❌ Empleado ya registrado</span>';
-                    return;
-                }
-
-                await db.collection('usuarios').add({
-                    empleado: empleado,
-                    password: password,
-                    nombre: nombre || empleado,
-                    fechaRegistro: new Date().toLocaleString()
-                });
-
-                mensajeDiv.innerHTML = '<span style="color: #27AE60;">✅ Registro exitoso</span>';
-                
-                setTimeout(() => {
-                    cerrarRegistro();
-                }, 1500);
-
-            } catch (error) {
-                mensajeDiv.innerHTML = '<span style="color: #E74C3C;">❌ Error: ' + error.message + '</span>';
-                console.error(error);
-            }
+        if (!snapshot.empty) {
+            mensajeDiv.innerHTML = '<span style="color: #E74C3C;">❌ Empleado ya registrado</span>';
+            return;
         }
+
+        // Guardar con NOMBRE
+        await db.collection('usuarios').add({
+            empleado: empleado,
+            password: password,
+            nombre: nombre || empleado,  // ← Si no hay nombre, usa el empleado
+            email: user.email,
+            fechaRegistro: new Date().toLocaleString()
+        });
+
+        mensajeDiv.innerHTML = '<span style="color: #27AE60;">✅ Registro exitoso</span>';
+        
+        setTimeout(() => {
+            cerrarRegistro();
+        }, 1500);
+
+    } catch (error) {
+        mensajeDiv.innerHTML = '<span style="color: #E74C3C;">❌ Error: ' + error.message + '</span>';
+        console.error(error);
+    }
+}
 
         // Permitir login con Enter
         document.addEventListener('keypress', function(e) {
