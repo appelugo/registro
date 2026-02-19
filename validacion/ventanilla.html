@@ -645,13 +645,12 @@
         let esModoEdicion = true;
 
         // ============================================
-        // VERIFICAR AUTENTICACIÓN - CORREGIDO
+        // VERIFICAR AUTENTICACIÓN
         // ============================================
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 document.getElementById('userInfo').style.display = 'flex';
                 
-                // Buscar el empleado asociado al email
                 try {
                     const snapshot = await db.collection('usuarios')
                         .where('email', '==', user.email)
@@ -659,15 +658,12 @@
                     
                     if (!snapshot.empty) {
                         snapshot.forEach(doc => {
-                            // Mostrar el número de empleado
                             document.getElementById('userEmpleado').textContent = doc.data().empleado || user.email;
                         });
                     } else {
-                        // Si no encuentra por email, mostrar el email
                         document.getElementById('userEmpleado').textContent = user.email;
                     }
                 } catch (e) {
-                    console.log('Error buscando usuario:', e);
                     document.getElementById('userEmpleado').textContent = user.email;
                 }
                 
@@ -687,20 +683,35 @@
         }
 
         // ============================================
-        // CARGAR ORGANIGRAMA
+        // CARGAR ORGANIGRAMA - VERSIÓN CORREGIDA
         // ============================================
         async function cargarOrganigrama() {
+            console.log('🔍 Intentando cargar organigrama...');
             try {
                 const snapshot = await db.collection('organigrama').doc('lista_cecos').get();
+                
                 if (snapshot.exists) {
                     const data = snapshot.data();
-                    datosOrganigrama = data.datosCompletos || [];
-                    console.log(`✅ Organigrama cargado: ${datosOrganigrama.length} registros`);
+                    console.log('✅ Documento encontrado');
+                    
+                    if (data.datosCompletos && Array.isArray(data.datosCompletos)) {
+                        datosOrganigrama = data.datosCompletos;
+                        console.log(`✅ Organigrama cargado: ${datosOrganigrama.length} registros`);
+                        
+                        if (datosOrganigrama.length > 0) {
+                            console.log('📋 Primer registro:', datosOrganigrama[0]);
+                        }
+                    } else {
+                        console.log('⚠️ El documento no tiene datosCompletos');
+                        datosOrganigrama = [];
+                    }
                 } else {
-                    console.log('⚠️ No hay organigrama cargado');
+                    console.log('❌ El documento lista_cecos NO existe');
+                    datosOrganigrama = [];
                 }
             } catch (error) {
-                console.error('Error cargando organigrama:', error);
+                console.error('❌ Error cargando organigrama:', error);
+                datosOrganigrama = [];
             }
         }
 
@@ -713,18 +724,22 @@
                 return { nombre: '', marca: '' };
             }
             
-            // Convertir a string para comparación segura
             const cecoStr = String(ceco).trim();
-            const tienda = datosOrganigrama.find(t => String(t.ceco).trim() === cecoStr);
+            console.log('🔍 Buscando CECO:', cecoStr);
             
-            if (tienda) {
-                console.log('✅ Tienda encontrada:', tienda);
+            const tiendaEncontrada = datosOrganigrama.find(item => {
+                const itemCeco = item.ceco ? String(item.ceco).trim() : '';
+                return itemCeco === cecoStr;
+            });
+            
+            if (tiendaEncontrada) {
+                console.log('✅ Tienda encontrada:', tiendaEncontrada);
                 return {
-                    nombre: tienda.tienda || '',    // Campo correcto: 'tienda' (columna E)
-                    marca: tienda.marca || ''        // Campo 'marca' (columna B)
+                    nombre: tiendaEncontrada.tienda || '',
+                    marca: tiendaEncontrada.marca || ''
                 };
             } else {
-                console.log('❌ Tienda no encontrada para CECO:', ceco);
+                console.log('❌ No se encontró el CECO:', cecoStr);
                 return { nombre: '', marca: '' };
             }
         }
@@ -823,15 +838,13 @@
                     
                     const fila = document.createElement('tr');
                     
-                    // Determinar clase del badge según marca
                     let badgeClass = '';
                     if (datos.marca.toUpperCase().includes('DOMINO')) {
                         badgeClass = 'badge-dominos';
-                    } else if (datos.marca.toUpperCase().includes('STARBUCKS')) {
+                    } else if (datos.marca.toUpperCase().includes('STARBUCKS') || datos.marca.toUpperCase().includes('CHILIS')) {
                         badgeClass = 'badge-starbucks';
                     }
                     
-                    // Valores previos de remisión y complemento
                     const remisionPrev = (registro.validacion?.tiendas && registro.validacion.tiendas[index]?.remision) || '';
                     const complementoPrev = (registro.validacion?.tiendas && registro.validacion.tiendas[index]?.complemento) || '';
                     
@@ -884,7 +897,6 @@
             mostrarLoader('Guardando validación...');
 
             try {
-                // Recolectar remisiones y complementos
                 const tiendasValidacion = [];
                 const filas = document.querySelectorAll('#tablaBody tr');
                 
@@ -986,6 +998,19 @@
             document.getElementById('btnValidar').disabled = false;
             esModoEdicion = true;
         }
+
+        // ============================================
+        // FUNCIÓN DE PRUEBA - EJECUTAR AL INICIO
+        // ============================================
+        setTimeout(() => {
+            console.log('🔍 Verificando organigrama automáticamente...');
+            if (datosOrganigrama.length > 0) {
+                console.log('✅ datosOrganigrama tiene', datosOrganigrama.length, 'registros');
+                console.log('Primer registro:', datosOrganigrama[0]);
+            } else {
+                console.log('❌ datosOrganigrama está vacío');
+            }
+        }, 3000);
     </script>
 </body>
 </html>
