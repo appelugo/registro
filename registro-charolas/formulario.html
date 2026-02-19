@@ -99,11 +99,6 @@
             font-weight: 300;
         }
 
-        .spacer {
-            width: 100px;
-            visibility: hidden;
-        }
-
         .general-form {
             background: linear-gradient(to right, var(--light), var(--white));
             padding: 12px 20px;
@@ -153,19 +148,16 @@
             border-left: 4px solid var(--danger);
         }
 
-        /* ============================================ */
-        /* VALIDACIÓN DE TIENDAS - COLORES             */
-        /* ============================================ */
-        input.valido {
+        .form-group input.error {
+            border-left: 4px solid var(--danger);
+            border-color: var(--danger);
+            background-color: rgba(231, 76, 60, 0.05);
+        }
+
+        .form-group input.valido {
             border-left: 4px solid #27AE60 !important;
             border-color: #27AE60 !important;
             background-color: rgba(39, 174, 96, 0.05) !important;
-        }
-
-        input.error {
-            border-left: 4px solid #E74C3C !important;
-            border-color: #E74C3C !important;
-            background-color: rgba(231, 76, 60, 0.05) !important;
         }
 
         .comentario-group {
@@ -280,9 +272,6 @@
             flex-wrap: wrap;
         }
 
-        /* ============================================ */
-        /* BOTÓN ORGANIGRAMA                            */
-        /* ============================================ */
         .btn-organigrama {
             display: inline-flex;
             align-items: center;
@@ -308,11 +297,6 @@
             background: #E67E22;
             transform: translateY(-1px);
             box-shadow: 0 4px 10px rgba(243, 156, 18, 0.4);
-        }
-
-        .btn-organigrama:active {
-            transform: translateY(0);
-            background: #D35400;
         }
 
         .table-section {
@@ -796,7 +780,6 @@
                 </div>
                 
                 <div class="button-group">
-                    <!-- BOTÓN ORGANIGRAMA -->
                     <button class="btn-organigrama" onclick="abrirModalOrganigrama()">
                         📋 Organigrama
                     </button>
@@ -843,7 +826,7 @@
         <div class="modal-content">
             <span class="modal-close" onclick="cerrarModalOrganigrama()">✖</span>
             <h3>📋 Cargar Organigrama</h3>
-            <p style="margin-bottom: 20px;">Selecciona el archivo Excel (.xlsx) con la columna CECO</p>
+            <p style="margin-bottom: 20px;">Selecciona el archivo Excel (.xlsx) con los datos completos</p>
             <input type="file" id="fileOrganigrama" accept=".xlsx">
             <div style="display: flex; gap: 10px; justify-content: center;">
                 <button class="btn btn-success" onclick="procesarOrganigrama()">Cargar</button>
@@ -877,7 +860,7 @@
 
     <script>
         // ============================================
-        // 🔥 CONFIGURACIÓN DE FIREBASE (TUS DATOS)
+        // 🔥 CONFIGURACIÓN DE FIREBASE
         // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyDD0lCq8rAnCm2KjsqSwzxlpUhQU2gRVfk",
@@ -945,7 +928,7 @@
         }
 
         // ============================================
-        // PROCESAR ARCHIVO EXCEL
+        // PROCESAR ARCHIVO EXCEL - VERSIÓN MEJORADA
         // ============================================
         async function procesarOrganigrama() {
             const fileInput = document.getElementById('fileOrganigrama');
@@ -966,44 +949,54 @@
                     const sheet = workbook.Sheets[workbook.SheetNames[0]];
                     const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-                    // Buscar columna CECO
+                    // Buscar índices de columnas importantes
                     const headers = rows[0];
-                    let columnaCECO = -1;
+                    let idxCECO = -1, idxMARCA = -1, idxTIENDA = -1;
                     
                     headers.forEach((header, index) => {
-                        if (String(header).toUpperCase().includes('CECO')) {
-                            columnaCECO = index;
-                        }
+                        const h = String(header).toUpperCase();
+                        if (h.includes('CECO')) idxCECO = index;
+                        if (h.includes('MARCA')) idxMARCA = index;
+                        if (h.includes('TIENDA') && !h.includes('TIPO') && !h.includes('UNIDAD')) idxTIENDA = index;
                     });
 
-                    if (columnaCECO === -1) {
+                    if (idxCECO === -1) {
                         throw new Error('No se encontró la columna CECO en el archivo');
                     }
 
-                    // Extraer CECOs (desde fila 2 en adelante)
-                    const nuevosCECOs = [];
+                    // Extraer datos completos
+                    const cecos = [];
+                    const datosCompletos = [];
+                    
                     for (let i = 1; i < rows.length; i++) {
                         const fila = rows[i];
-                        if (fila && fila[columnaCECO]) {
-                            const ceco = String(fila[columnaCECO]).trim();
-                            if (ceco) nuevosCECOs.push(ceco);
+                        if (fila && fila[idxCECO]) {
+                            const ceco = String(fila[idxCECO]).trim();
+                            cecos.push(ceco);
+                            
+                            datosCompletos.push({
+                                ceco: ceco,
+                                marca: idxMARCA !== -1 && fila[idxMARCA] ? String(fila[idxMARCA]).trim() : '',
+                                nombreTienda: idxTIENDA !== -1 && fila[idxTIENDA] ? String(fila[idxTIENDA]).trim() : ''
+                            });
                         }
                     }
 
-                    actualizarLoaderMensaje(`Guardando ${nuevosCECOs.length} CECOs en Firebase...`);
+                    actualizarLoaderMensaje(`Guardando ${datosCompletos.length} registros en Firebase...`);
 
-                    // Guardar en Firebase
+                    // Guardar en Firebase - AHORA CON TODOS LOS DATOS
                     await db.collection('organigrama').doc('lista_cecos').set({
-                        cecos: nuevosCECOs,
+                        cecos: cecos,
+                        datosCompletos: datosCompletos,
                         fecha_actualizacion: new Date().toLocaleString(),
-                        total: nuevosCECOs.length
+                        total: datosCompletos.length
                     });
 
                     // Actualizar lista local
-                    listaCECOs = nuevosCECOs;
+                    listaCECOs = cecos;
 
                     ocultarLoader();
-                    alert(`✅ Organigrama cargado con ${nuevosCECOs.length} CECOs`);
+                    alert(`✅ Organigrama cargado con ${datosCompletos.length} registros`);
                     cerrarModalOrganigrama();
 
                 } catch (error) {
@@ -1016,13 +1009,12 @@
         }
 
         // ============================================
-        // ✅ VALIDAR TIENDA CON COLORES
+        // VALIDAR TIENDA (SOLO CECO)
         // ============================================
         function validarTienda(input) {
             const tienda = input.value.trim();
             
             if (!tienda) {
-                // Campo vacío - sin color
                 input.classList.remove('valido');
                 input.classList.remove('error');
                 return true;
@@ -1031,12 +1023,10 @@
             const existe = listaCECOs.includes(tienda);
             
             if (existe) {
-                // ✅ VÁLIDO - Verde
                 input.classList.add('valido');
                 input.classList.remove('error');
                 return true;
             } else {
-                // ❌ NO VÁLIDO - Rojo
                 input.classList.add('error');
                 input.classList.remove('valido');
                 return false;
@@ -1223,7 +1213,7 @@
         }
 
         // ============================================
-        // VALIDAR Y GUARDAR (CON VALIDACIÓN DE ORGANIGRAMA)
+        // VALIDAR Y GUARDAR
         // ============================================
         function validarYGuardar() {
             if (!validarCamposObligatorios()) {
