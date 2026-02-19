@@ -10,6 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <style>
+        /* (Mantén todos tus estilos actuales) */
         * {
             margin: 0;
             padding: 0;
@@ -97,6 +98,11 @@
         .header-compact h1 span {
             color: var(--accent);
             font-weight: 300;
+        }
+
+        .spacer {
+            width: 100px;
+            visibility: hidden;
         }
 
         .general-form {
@@ -900,7 +906,8 @@
             try {
                 const snapshot = await db.collection('organigrama').doc('lista_cecos').get();
                 if (snapshot.exists) {
-                    listaCECOs = snapshot.data().cecos || [];
+                    const data = snapshot.data();
+                    listaCECOs = data.cecos || [];
                     console.log(`✅ CECOs cargados: ${listaCECOs.length}`);
                 } else {
                     console.log('No hay organigrama cargado aún');
@@ -928,7 +935,7 @@
         }
 
         // ============================================
-        // PROCESAR ARCHIVO EXCEL - VERSIÓN MEJORADA
+        // PROCESAR ARCHIVO EXCEL - GUARDA TABLA COMPLETA
         // ============================================
         async function procesarOrganigrama() {
             const fileInput = document.getElementById('fileOrganigrama');
@@ -949,59 +956,78 @@
                     const sheet = workbook.Sheets[workbook.SheetNames[0]];
                     const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-                    // Buscar índices de columnas importantes
+                    // Buscar índices de columnas
                     const headers = rows[0];
-                    let idxCECO = -1, idxMARCA = -1, idxTIENDA = -1;
+                    
+                    // Mapeo de columnas según el orden que especificaste
+                    const columnas = {
+                        CEDIS: -1,
+                        MARCA: -1,
+                        CECO: -1,
+                        STATUS: -1,
+                        TIENDA: -1,
+                        TIPO_UNIDAD: -1,
+                        ESTADO: -1
+                    };
                     
                     headers.forEach((header, index) => {
-                        const h = String(header).toUpperCase();
-                        if (h.includes('CECO')) idxCECO = index;
-                        if (h.includes('MARCA')) idxMARCA = index;
-                        if (h.includes('TIENDA') && !h.includes('TIPO') && !h.includes('UNIDAD')) idxTIENDA = index;
+                        const h = String(header).toUpperCase().trim();
+                        if (h.includes('CEDIS')) columnas.CEDIS = index;
+                        if (h.includes('MARCA')) columnas.MARCA = index;
+                        if (h.includes('CECO')) columnas.CECO = index;
+                        if (h.includes('STATUS')) columnas.STATUS = index;
+                        if (h.includes('TIENDA') && !h.includes('TIPO')) columnas.TIENDA = index;
+                        if (h.includes('TIPO DE UNIDAD') || h.includes('TIPO UNIDAD')) columnas.TIPO_UNIDAD = index;
+                        if (h.includes('ESTADO')) columnas.ESTADO = index;
                     });
 
-                    if (idxCECO === -1) {
+                    if (columnas.CECO === -1) {
                         throw new Error('No se encontró la columna CECO en el archivo');
                     }
 
-                    // Extraer datos completos
+                    // Extraer datos completos en el orden solicitado
                     const cecos = [];
-                    const datosCompletos = [];
+                    const organigramaCompleto = [];
                     
                     for (let i = 1; i < rows.length; i++) {
                         const fila = rows[i];
-                        if (fila && fila[idxCECO]) {
-                            const ceco = String(fila[idxCECO]).trim();
+                        if (fila && fila[columnas.CECO]) {
+                            const ceco = String(fila[columnas.CECO]).trim();
                             cecos.push(ceco);
                             
-                            datosCompletos.push({
+                            organigramaCompleto.push({
+                                cedis: columnas.CEDIS !== -1 && fila[columnas.CEDIS] ? String(fila[columnas.CEDIS]).trim() : '',
+                                marca: columnas.MARCA !== -1 && fila[columnas.MARCA] ? String(fila[columnas.MARCA]).trim() : '',
                                 ceco: ceco,
-                                marca: idxMARCA !== -1 && fila[idxMARCA] ? String(fila[idxMARCA]).trim() : '',
-                                nombreTienda: idxTIENDA !== -1 && fila[idxTIENDA] ? String(fila[idxTIENDA]).trim() : ''
+                                status: columnas.STATUS !== -1 && fila[columnas.STATUS] ? String(fila[columnas.STATUS]).trim() : '',
+                                tienda: columnas.TIENDA !== -1 && fila[columnas.TIENDA] ? String(fila[columnas.TIENDA]).trim() : '',
+                                tipoUnidad: columnas.TIPO_UNIDAD !== -1 && fila[columnas.TIPO_UNIDAD] ? String(fila[columnas.TIPO_UNIDAD]).trim() : '',
+                                estado: columnas.ESTADO !== -1 && fila[columnas.ESTADO] ? String(fila[columnas.ESTADO]).trim() : ''
                             });
                         }
                     }
 
-                    actualizarLoaderMensaje(`Guardando ${datosCompletos.length} registros en Firebase...`);
+                    actualizarLoaderMensaje(`Guardando ${organigramaCompleto.length} registros en Firebase...`);
 
-                    // Guardar en Firebase - AHORA CON TODOS LOS DATOS
+                    // Guardar en Firebase - AHORA CON LA TABLA COMPLETA
                     await db.collection('organigrama').doc('lista_cecos').set({
                         cecos: cecos,
-                        datosCompletos: datosCompletos,
+                        datosCompletos: organigramaCompleto,
                         fecha_actualizacion: new Date().toLocaleString(),
-                        total: datosCompletos.length
+                        total: organigramaCompleto.length
                     });
 
                     // Actualizar lista local
                     listaCECOs = cecos;
 
                     ocultarLoader();
-                    alert(`✅ Organigrama cargado con ${datosCompletos.length} registros`);
+                    alert(`✅ Organigrama cargado con ${organigramaCompleto.length} registros`);
                     cerrarModalOrganigrama();
 
                 } catch (error) {
                     ocultarLoader();
                     alert('❌ Error procesando archivo: ' + error.message);
+                    console.error('Error detallado:', error);
                 }
             };
 
