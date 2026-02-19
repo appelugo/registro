@@ -945,75 +945,109 @@
         }
 
         // ============================================
-        // PROCESAR ARCHIVO EXCEL
-        // ============================================
-        async function procesarOrganigrama() {
-            const fileInput = document.getElementById('fileOrganigrama');
-            const file = fileInput.files[0];
-            
-            if (!file) {
-                alert('❌ Selecciona un archivo');
-                return;
+// PROCESAR ARCHIVO EXCEL - GUARDA TODAS LAS COLUMNAS
+// ============================================
+async function procesarOrganigrama() {
+    const fileInput = document.getElementById('fileOrganigrama');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        alert('❌ Selecciona un archivo');
+        return;
+    }
+
+    mostrarLoader('Leyendo archivo Excel...');
+
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+            // Verificar que hay datos
+            if (rows.length < 2) {
+                throw new Error('El archivo está vacío');
             }
 
-            mostrarLoader('Leyendo archivo Excel...');
-
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-                    // Buscar columna CECO
-                    const headers = rows[0];
-                    let columnaCECO = -1;
-                    
-                    headers.forEach((header, index) => {
-                        if (String(header).toUpperCase().includes('CECO')) {
-                            columnaCECO = index;
-                        }
-                    });
-
-                    if (columnaCECO === -1) {
-                        throw new Error('No se encontró la columna CECO en el archivo');
-                    }
-
-                    // Extraer CECOs (desde fila 2 en adelante)
-                    const nuevosCECOs = [];
-                    for (let i = 1; i < rows.length; i++) {
-                        const fila = rows[i];
-                        if (fila && fila[columnaCECO]) {
-                            const ceco = String(fila[columnaCECO]).trim();
-                            if (ceco) nuevosCECOs.push(ceco);
-                        }
-                    }
-
-                    actualizarLoaderMensaje(`Guardando ${nuevosCECOs.length} CECOs en Firebase...`);
-
-                    // Guardar en Firebase
-                    await db.collection('organigrama').doc('lista_cecos').set({
-                        cecos: nuevosCECOs,
-                        fecha_actualizacion: new Date().toLocaleString(),
-                        total: nuevosCECOs.length
-                    });
-
-                    // Actualizar lista local
-                    listaCECOs = nuevosCECOs;
-
-                    ocultarLoader();
-                    alert(`✅ Organigrama cargado con ${nuevosCECOs.length} CECOs`);
-                    cerrarModalOrganigrama();
-
-                } catch (error) {
-                    ocultarLoader();
-                    alert('❌ Error procesando archivo: ' + error.message);
-                }
+            const headers = rows[0];
+            
+            // Mapeo de columnas según el orden especificado
+            const columnas = {
+                CEDIS: -1,
+                MARCA: -1,
+                CECO: -1,
+                STATUS: -1,
+                TIENDA: -1,
+                TIPO_UNIDAD: -1,
+                ESTADO: -1
             };
+            
+            // Identificar índices de columnas (búsqueda flexible)
+            headers.forEach((header, index) => {
+                const h = String(header).toUpperCase().trim();
+                if (h.includes('CEDIS')) columnas.CEDIS = index;
+                if (h.includes('MARCA')) columnas.MARCA = index;
+                if (h.includes('CECO')) columnas.CECO = index;
+                if (h.includes('STATUS')) columnas.STATUS = index;
+                if (h.includes('TIENDA') && !h.includes('TIPO')) columnas.TIENDA = index;
+                if (h.includes('TIPO DE UNIDAD') || h.includes('TIPO UNIDAD')) columnas.TIPO_UNIDAD = index;
+                if (h.includes('ESTADO')) columnas.ESTADO = index;
+            });
 
-            reader.readAsArrayBuffer(file);
+            if (columnas.CECO === -1) {
+                throw new Error('No se encontró la columna CECO en el archivo');
+            }
+
+            // Extraer datos completos
+            const cecos = [];
+            const datosCompletos = [];
+            
+            for (let i = 1; i < rows.length; i++) {
+                const fila = rows[i];
+                if (fila && fila[columnas.CECO]) {
+                    const ceco = String(fila[columnas.CECO]).trim();
+                    cecos.push(ceco);
+                    
+                    datosCompletos.push({
+                        cedis: columnas.CEDIS !== -1 && fila[columnas.CEDIS] ? String(fila[columnas.CEDIS]).trim() : '',
+                        marca: columnas.MARCA !== -1 && fila[columnas.MARCA] ? String(fila[columnas.MARCA]).trim() : '',
+                        ceco: ceco,
+                        status: columnas.STATUS !== -1 && fila[columnas.STATUS] ? String(fila[columnas.STATUS]).trim() : '',
+                        tienda: columnas.TIENDA !== -1 && fila[columnas.TIENDA] ? String(fila[columnas.TIENDA]).trim() : '',
+                        tipoUnidad: columnas.TIPO_UNIDAD !== -1 && fila[columnas.TIPO_UNIDAD] ? String(fila[columnas.TIPO_UNIDAD]).trim() : '',
+                        estado: columnas.ESTADO !== -1 && fila[columnas.ESTADO] ? String(fila[columnas.ESTADO]).trim() : ''
+                    });
+                }
+            }
+
+            actualizarLoaderMensaje(`Guardando ${datosCompletos.length} registros en Firebase...`);
+
+            // 🔥 GUARDAR EN FIREBASE (REEMPLAZANDO DATOS ANTERIORES)
+            await db.collection('organigrama').doc('lista_cecos').set({
+                cecos: cecos,
+                datosCompletos: datosCompletos,
+                fecha_actualizacion: new Date().toLocaleString(),
+                total: datosCompletos.length
+            });
+
+            // Actualizar lista local
+            listaCECOs = cecos;
+
+            ocultarLoader();
+            alert(`✅ Organigrama cargado con ${datosCompletos.length} registros`);
+            cerrarModalOrganigrama();
+
+        } catch (error) {
+            ocultarLoader();
+            alert('❌ Error procesando archivo: ' + error.message);
+            console.error('Error detallado:', error);
         }
+    };
+
+    reader.readAsArrayBuffer(file);
+}
 
         // ============================================
         // ✅ VALIDAR TIENDA CON COLORES
@@ -1445,3 +1479,4 @@
     </script>
 </body>
 </html>
+
