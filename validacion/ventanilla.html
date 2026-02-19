@@ -4,581 +4,130 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>Ventanilla - Validador de Charolas</title>
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
-        }
-
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
         :root {
-            --primary: #0A2342;
-            --secondary: #2C4C6B;
-            --accent: #4A89C5;
-            --light: #F5F9FF;
-            --white: #FFFFFF;
-            --gray: #E8EEF2;
-            --text-dark: #1E2B3C;
-            --success: #27AE60;
-            --danger: #E74C3C;
-            --warning: #F39C12;
-            --border-radius: 6px;
-            --box-shadow: 0 2px 6px rgba(10, 35, 66, 0.08);
+            --primary:#0A2342; --secondary:#2C4C6B; --accent:#4A89C5; --light:#F5F9FF;
+            --white:#fff; --gray:#E8EEF2; --text-dark:#1E2B3C; --success:#27AE60;
+            --danger:#E74C3C; --warning:#F39C12; --border-radius:6px;
         }
-
-        body {
-            background-color: var(--gray);
-            color: var(--text-dark);
-            line-height: 1.3;
-            padding: 12px;
-            min-height: 100vh;
-        }
-
+        body { background:var(--gray); color:var(--text-dark); line-height:1.3; padding:12px; min-height:100vh; }
         .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background-color: var(--white);
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            height: calc(100vh - 24px);
+            max-width:1400px; margin:0 auto; background:var(--white); border-radius:var(--border-radius);
+            box-shadow:0 2px 6px rgba(10,35,66,0.08); padding:15px; display:flex; flex-direction:column;
+            height:calc(100vh - 24px);
         }
-
-        .header-fijo {
-            flex-shrink: 0;
-            background-color: var(--white);
-            padding-bottom: 6px;
-            border-bottom: 2px solid var(--accent);
-            margin-bottom: 8px;
-        }
-
-        .header-superior {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 6px;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logo-small {
-            height: 35px;
-            width: auto;
-        }
-
-        .header-left h1 {
-            color: var(--primary);
-            font-weight: 600;
-            font-size: 1.2rem;
-            margin: 0;
-        }
-
-        .header-left h1 span {
-            color: var(--accent);
-            font-weight: 300;
-        }
-
-        .header-derecha {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background-color: var(--light);
-            padding: 4px 12px;
-            border-radius: 30px;
-            border-left: 4px solid var(--accent);
-        }
-
-        .user-empleado {
-            font-weight: 600;
-            color: var(--primary);
-            font-size: 0.8rem;
-        }
-
-        .btn-validar-header {
-            background-color: var(--warning);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 6px 18px;
-            font-weight: 700;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 2px 6px rgba(243, 156, 18, 0.3);
-        }
-
-        .btn-validar-header:hover {
-            background-color: #E67E22;
-            transform: translateY(-1px);
-        }
-
-        .btn-validar-header:disabled {
-            background-color: #95A5A6;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .btn {
-            padding: 4px 10px;
-            border: none;
-            border-radius: 5px;
-            font-weight: 600;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            white-space: nowrap;
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #0D2B4A;
-        }
-
-        .btn-danger {
-            background-color: var(--danger);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background-color: #C0392B;
-        }
-
-        .form-principal {
-            background: linear-gradient(to right, var(--light), var(--white));
-            padding: 8px 12px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            border: 1px solid rgba(74, 137, 197, 0.15);
-        }
-
-        .fila-campos {
-            display: grid;
-            grid-template-columns: 1.2fr 0.9fr 0.9fr 0.7fr 0.9fr 0.9fr 0.9fr;
-            gap: 6px;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-
-        .campo-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .campo-group label {
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 1px;
-            font-size: 0.6rem;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-
-        .campo-group input, 
-        .campo-group select,
-        .campo-group .valor {
-            padding: 4px 8px;
-            border: 1.5px solid var(--gray);
-            border-radius: 5px;
-            font-size: 0.8rem;
-            background-color: var(--white);
-            height: 30px;
-        }
-
-        .campo-group .valor {
-            background-color: #F0F4F8;
-            color: var(--text-dark);
-            display: flex;
-            align-items: center;
-        }
-
-        .campo-group.check-group {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            height: auto;
-        }
-
-        .campo-group.check-group label {
-            margin-bottom: 0;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 0.7rem;
-            text-transform: none;
-            font-weight: 500;
-        }
-
-        .campo-group.check-group input[type="checkbox"] {
-            width: 14px;
-            height: 14px;
-            margin: 0;
-        }
-
-        .busqueda-integrada {
-            display: flex;
-            gap: 3px;
-            align-items: flex-end;
-        }
-
-        .busqueda-integrada .campo-group {
-            flex: 1;
-        }
-
-        .btn-lupa {
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.9rem;
-            margin-bottom: 0;
-        }
-
-        .btn-lupa:hover {
-            background-color: #3A7AB0;
-            transform: translateY(-1px);
-        }
-
-        .btn-lupa:disabled {
-            background-color: #95A5A6;
-            cursor: not-allowed;
-        }
-
-        .fila-comentario {
-            margin-top: 6px;
-            display: grid;
-            grid-template-columns: 0.9fr 3fr;
-            gap: 6px;
-        }
-
-        .validado-message {
-            background-color: rgba(39, 174, 96, 0.1);
-            color: var(--success);
-            padding: 6px 12px;
-            border-radius: 5px;
-            border-left: 4px solid var(--success);
-            margin-bottom: 10px;
-            font-weight: 600;
-            font-size: 0.8rem;
-        }
-
-        .mensaje-error {
-            color: var(--danger);
-            font-size: 0.75rem;
-            margin: 8px 0;
-            padding: 6px 10px;
-            background-color: rgba(231, 76, 60, 0.05);
-            border-radius: 5px;
-            border-left: 4px solid var(--danger);
-        }
-
-        .tabla-section {
-            margin-top: 10px;
-        }
-
-        .tabla-section h3 {
-            color: var(--primary);
-            margin-bottom: 6px;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        .table-responsive {
-            overflow-x: auto;
-            border-radius: 6px;
-            border: 1px solid var(--gray);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: auto;
-            min-width: 1200px;
-        }
-
-        th {
-            background-color: var(--primary);
-            color: var(--white);
-            padding: 6px 4px;
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            text-align: center;
-        }
-
-        td {
-            padding: 5px 4px;
-            border-bottom: 1px solid var(--gray);
-            text-align: center;
-            font-size: 0.75rem;
-        }
-
-        .table-input {
-            width: 100%;
-            padding: 4px 6px;
-            border: 1.5px solid var(--gray);
-            border-radius: 4px;
-            font-size: 0.75rem;
-            text-align: center;
-            background-color: var(--white);
-        }
-
-        .table-input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(74, 137, 197, 0.1);
-        }
-
-        .table-input:disabled {
-            background-color: #F0F4F8;
-            color: var(--text-dark);
-            border-color: #D5DBDB;
-        }
-
-        .badge {
-            padding: 2px 6px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.6rem;
-            text-transform: uppercase;
-            display: inline-block;
-        }
-
-        .badge-dominos {
-            background-color: rgba(0, 165, 176, 0.1);
-            color: #00A5B0;
-            border: 1px solid #00A5B0;
-        }
-
-        .badge-starbucks {
-            background-color: rgba(0, 98, 65, 0.1);
-            color: #006241;
-            border: 1px solid #006241;
-        }
-
-        .loader-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(10, 35, 66, 0.7);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 20000;
-            backdrop-filter: blur(3px);
-        }
-
-        .loader-container {
-            background-color: white;
-            padding: 15px 25px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .loader-spinner {
-            width: 35px;
-            height: 35px;
-            border: 3px solid var(--light);
-            border-top: 3px solid var(--accent);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .footer {
-            margin-top: 10px;
-            color: var(--secondary);
-            font-size: 0.6rem;
-            text-align: right;
-            border-top: 1px solid var(--gray);
-            padding-top: 6px;
-            flex-shrink: 0;
-        }
+        .header-fijo { flex-shrink:0; background:var(--white); padding-bottom:6px; border-bottom:2px solid var(--accent); margin-bottom:8px; }
+        .header-superior { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+        .header-left { display:flex; align-items:center; gap:10px; }
+        .logo-small { height:35px; width:auto; }
+        .header-left h1 { color:var(--primary); font-size:1.2rem; }
+        .header-left h1 span { color:var(--accent); font-weight:300; }
+        .header-derecha { display:flex; align-items:center; gap:10px; }
+        .user-info { display:flex; align-items:center; gap:12px; background:var(--light); padding:4px 12px; border-radius:30px; border-left:4px solid var(--accent); }
+        .user-empleado { font-weight:600; color:var(--primary); font-size:0.8rem; }
+        .btn-validar-header { background:var(--warning); color:white; border:none; border-radius:5px; padding:6px 18px; font-weight:700; font-size:0.8rem; text-transform:uppercase; cursor:pointer; }
+        .btn-validar-header:hover { background:#E67E22; }
+        .btn-validar-header:disabled { background:#95A5A6; cursor:not-allowed; }
+        .btn { padding:4px 10px; border:none; border-radius:5px; font-weight:600; font-size:0.7rem; text-transform:uppercase; cursor:pointer; }
+        .btn-primary { background:var(--primary); color:white; }
+        .btn-danger { background:var(--danger); color:white; }
+        .form-principal { background:linear-gradient(to right,var(--light),var(--white)); padding:8px 12px; border-radius:8px; margin-bottom:8px; border:1px solid rgba(74,137,197,0.15); }
+        .fila-campos { display:grid; grid-template-columns:1.2fr 0.9fr 0.9fr 0.7fr 0.9fr 0.9fr 0.9fr; gap:6px; align-items:center; margin-bottom:6px; }
+        .campo-group { display:flex; flex-direction:column; }
+        .campo-group label { font-weight:600; color:var(--primary); margin-bottom:1px; font-size:0.6rem; text-transform:uppercase; }
+        .campo-group input, .campo-group .valor { padding:4px 8px; border:1.5px solid var(--gray); border-radius:5px; font-size:0.8rem; background:var(--white); height:30px; }
+        .campo-group .valor { background:#F0F4F8; display:flex; align-items:center; }
+        .campo-group.check-group { display:flex; flex-direction:column; gap:4px; }
+        .campo-group.check-group label { display:flex; align-items:center; gap:4px; font-size:0.7rem; text-transform:none; }
+        .busqueda-integrada { display:flex; gap:3px; align-items:flex-end; }
+        .busqueda-integrada .campo-group { flex:1; }
+        .btn-lupa { background:var(--accent); color:white; border:none; border-radius:5px; width:30px; height:30px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:0.9rem; }
+        .fila-comentario { margin-top:6px; display:grid; grid-template-columns:0.9fr 3fr; gap:6px; }
+        .validado-message { background:rgba(39,174,96,0.1); color:var(--success); padding:6px 12px; border-radius:5px; border-left:4px solid var(--success); margin-bottom:10px; font-weight:600; font-size:0.8rem; }
+        .mensaje-error { color:var(--danger); font-size:0.75rem; margin:8px 0; padding:6px 10px; background:rgba(231,76,60,0.05); border-radius:5px; border-left:4px solid var(--danger); }
+        .tabla-section { margin-top:10px; }
+        .table-responsive { overflow-x:auto; border-radius:6px; border:1px solid var(--gray); }
+        table { width:100%; border-collapse:collapse; table-layout:auto; min-width:1200px; }
+        th { background:var(--primary); color:white; padding:6px 4px; font-size:0.65rem; text-transform:uppercase; text-align:center; }
+        td { padding:5px 4px; border-bottom:1px solid var(--gray); text-align:center; font-size:0.75rem; }
+        .table-input { width:100%; padding:4px 6px; border:1.5px solid var(--gray); border-radius:4px; font-size:0.75rem; text-align:center; background:var(--white); }
+        .table-input:disabled { background:#F0F4F8; border-color:#D5DBDB; }
+        .badge { padding:2px 6px; border-radius:50px; font-weight:600; font-size:0.6rem; display:inline-block; }
+        .badge-dominos { background:rgba(0,165,176,0.1); color:#00A5B0; border:1px solid #00A5B0; }
+        .badge-starbucks { background:rgba(0,98,65,0.1); color:#006241; border:1px solid #006241; }
+        .loader-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,35,66,0.7); display:none; justify-content:center; align-items:center; z-index:20000; }
+        .loader-container { background:white; padding:15px 25px; border-radius:10px; text-align:center; }
+        .loader-spinner { width:35px; height:35px; border:3px solid var(--light); border-top:3px solid var(--accent); border-radius:50%; animation:spin 1s linear infinite; }
+        @keyframes spin { 0%{transform:rotate(0deg);} 100%{transform:rotate(360deg);} }
+        .footer { margin-top:10px; color:var(--secondary); font-size:0.6rem; text-align:right; border-top:1px solid var(--gray); padding-top:6px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- HEADER FIJO -->
         <div class="header-fijo">
             <div class="header-superior">
                 <div class="header-left">
-                    <img src="logo.png" alt="Logo" class="logo-small" onerror="this.style.display='none'">
+                    <img src="logo.png" class="logo-small" onerror="this.style.display='none'">
                     <h1>Ventanilla de <span>Validación</span></h1>
                 </div>
                 <div class="header-derecha">
-                    <div class="user-info" id="userInfo" style="display: none;">
-    <span class="user-empleado" id="userEmpleado"></span>
-    <button class="btn btn-danger" onclick="cerrarSesion()">SALIR</button>
-</div>
-                    <div id="loginButtons" style="display: flex; gap: 6px;">
+                    <div class="user-info" id="userInfo" style="display:none;">
+                        <span class="user-empleado" id="userEmpleado"></span>
+                        <button class="btn btn-danger" onclick="cerrarSesion()">SALIR</button>
+                    </div>
+                    <div id="loginButtons">
                         <button class="btn btn-primary" onclick="window.location.href='login.html'">ACCEDER</button>
                     </div>
                     <button class="btn-validar-header" id="btnValidar" onclick="guardarValidacion()">✅ VALIDAR</button>
                 </div>
             </div>
-
-            <!-- FORMULARIO PRINCIPAL -->
             <div class="form-principal">
                 <div class="fila-campos">
                     <div class="busqueda-integrada">
-                        <div class="campo-group">
-                            <label>🔍 BITÁCORA</label>
-                            <input type="text" id="buscarBitacora" placeholder="Número" onkeypress="if(event.key==='Enter'){buscarRegistro();}">
-                        </div>
-                        <button class="btn-lupa" id="btnBuscar" onclick="buscarRegistro()">🔍</button>
+                        <div class="campo-group"><label>🔍 BITÁCORA</label><input type="text" id="buscarBitacora" placeholder="Número" onkeypress="if(event.key==='Enter'){buscarRegistro();}"></div>
+                        <button class="btn-lupa" onclick="buscarRegistro()">🔍</button>
                     </div>
-
-                    <div class="campo-group">
-                        <label>VALIDADOR</label>
-                        <input type="text" id="validador" placeholder="Validador">
-                    </div>
-
-                    <div class="campo-group">
-                        <label>TRANSPORTE</label>
-                        <input type="text" id="transporte" placeholder="Transporte">
-                    </div>
-
+                    <div class="campo-group"><label>VALIDADOR</label><input type="text" id="validador" placeholder="Validador"></div>
+                    <div class="campo-group"><label>TRANSPORTE</label><input type="text" id="transporte" placeholder="Transporte"></div>
                     <div class="campo-group check-group">
                         <label><input type="checkbox" id="firmada" checked> FIRMADA</label>
                         <label><input type="checkbox" id="sellada" checked> SELLADA</label>
                     </div>
-
-                    <div class="campo-group">
-                        <label>FECHA</label>
-                        <input type="date" id="fechaBitacora">
-                    </div>
-
-                    <div class="campo-group">
-                        <label>OPERADOR</label>
-                        <input type="text" id="noOperador" placeholder="Operador">
-                    </div>
-
-                    <div class="campo-group">
-                        <label>VIAJE</label>
-                        <input type="text" id="noViaje" placeholder="Viaje">
-                    </div>
+                    <div class="campo-group"><label>FECHA</label><input type="date" id="fechaBitacora"></div>
+                    <div class="campo-group"><label>OPERADOR</label><input type="text" id="noOperador" placeholder="Operador"></div>
+                    <div class="campo-group"><label>VIAJE</label><input type="text" id="noViaje" placeholder="Viaje"></div>
                 </div>
-
                 <div class="fila-comentario">
-                    <div class="campo-group">
-                        <label>BOLETA</label>
-                        <input type="text" id="boleta" placeholder="Boleta">
-                    </div>
-                    <div class="campo-group">
-                        <label>COMENTARIOS</label>
-                        <input type="text" id="comentariosValidacion" placeholder="Observaciones de la validación">
-                    </div>
+                    <div class="campo-group"><label>BOLETA</label><input type="text" id="boleta" placeholder="Boleta"></div>
+                    <div class="campo-group"><label>COMENTARIOS</label><input type="text" id="comentariosValidacion" placeholder="Observaciones"></div>
                 </div>
             </div>
         </div>
-
-        <!-- SECCIÓN DESPLAZABLE -->
-        <div class="scrollable" style="flex: 1; overflow-y: auto; padding-right: 5px;">
-            <div id="validadoMessage" class="validado-message" style="display: none;">
-                ✅ Esta bitácora ya fue validada
-            </div>
-            <div id="mensajeError" class="mensaje-error" style="display: none;"></div>
-
-            <div class="form-principal" id="datosBitacora" style="display: none;">
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
-                    <div class="campo-group">
-                        <label>NO. EMPLEADO</label>
-                        <div class="valor" id="verNoEmpleado">—</div>
-                    </div>
-                    <div class="campo-group">
-                        <label>RUTA</label>
-                        <div class="valor" id="verRuta">—</div>
-                    </div>
-                    <div class="campo-group">
-                        <label>BITÁCORA</label>
-                        <div class="valor" id="verBitacora">—</div>
-                    </div>
-                    <div class="campo-group">
-                        <label>UNIDAD</label>
-                        <div class="valor" id="verUnidad">—</div>
-                    </div>
+        <div style="flex:1; overflow-y:auto; padding-right:5px;">
+            <div id="validadoMessage" class="validado-message" style="display:none;">✅ Esta bitácora ya fue validada</div>
+            <div id="mensajeError" class="mensaje-error" style="display:none;"></div>
+            <div class="form-principal" id="datosBitacora" style="display:none;">
+                <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px;">
+                    <div class="campo-group"><label>NO. EMPLEADO</label><div class="valor" id="verNoEmpleado">—</div></div>
+                    <div class="campo-group"><label>RUTA</label><div class="valor" id="verRuta">—</div></div>
+                    <div class="campo-group"><label>BITÁCORA</label><div class="valor" id="verBitacora">—</div></div>
+                    <div class="campo-group"><label>UNIDAD</label><div class="valor" id="verUnidad">—</div></div>
                 </div>
             </div>
-
-            <div id="tablaSection" style="display: none;" class="tabla-section">
+            <div id="tablaSection" style="display:none;" class="tabla-section">
                 <h3>📋 VALIDACIÓN DE TIENDAS</h3>
                 <div class="table-responsive">
-                    <table id="tablaTiendas">
-                        <thead>
-    <tr>
-        <th>CECO</th>
-        <th>NOMBRE TIENDA</th>
-        <th>MARCA</th>
-        <th>REMISIÓN</th>
-        <th>COMPLEMENTO</th>
-        <th>CANTIDAD</th>
-        <th>DIFERENCIA</th>
-        <th>CNT. FÍSICA</th>
-    </tr>
-</thead>
-                        <tbody id="tablaBody"></tbody>
-                    </table>
+                    <table id="tablaTiendas"><thead><tr><th>CECO</th><th>NOMBRE TIENDA</th><th>MARCA</th><th>REMISIÓN</th><th>COMPLEMENTO</th><th>CANTIDAD</th><th>DIFERENCIA</th><th>CNT. FÍSICA</th></tr></thead><tbody id="tablaBody"></tbody></table>
                 </div>
             </div>
         </div>
-
-        <div class="footer">
-            Sistema de Validación de Registro de charolas V2.0 | E.Lugo 2026
-        </div>
+        <div class="footer">Sistema de Validación V2.0 | E.Lugo 2026</div>
     </div>
-
-    <!-- LOADER -->
-    <div id="loaderOverlay" class="loader-overlay">
-        <div class="loader-container">
-            <div class="loader-spinner"></div>
-            <div class="loader-text">Procesando...</div>
-        </div>
-    </div>
+    <div id="loaderOverlay" class="loader-overlay"><div class="loader-container"><div class="loader-spinner"></div><div class="loader-text">Procesando...</div></div></div>
 
     <script>
         const firebaseConfig = {
@@ -589,344 +138,153 @@
             messagingSenderId: "105080206085",
             appId: "1:105080206085:web:443ba22aaf8cbcea767d6c"
         };
-
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
         const db = firebase.firestore();
 
-        let registroActual = null;
-        let documentoIdActual = null;
-        let datosOrganigrama = [];
-        let esModoEdicion = true;
+        let registroActual = null, documentoIdActual = null, datosOrganigrama = [], esModoEdicion = true;
 
-        // ============================================
-// VERIFICAR AUTENTICACIÓN - AHORA MUESTRA NOMBRE
-// ============================================
-auth.onAuthStateChanged(async (user) => {
-    if (user) {
-        document.getElementById('userInfo').style.display = 'flex';
-        
-        try {
-            // Buscar en la colección 'usuarios' por email
-            const snapshot = await db.collection('usuarios')
-                .where('email', '==', user.email)
-                .get();
-            
-            if (!snapshot.empty) {
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    // Mostrar nombre si existe, si no, mostrar empleado, si no, mostrar email
-                    const nombreMostrar = data.nombre || data.empleado || user.email;
-                    document.getElementById('userEmpleado').textContent = nombreMostrar;
-                });
-            } else {
-                // Si no encuentra en usuarios, mostrar solo el email
-                document.getElementById('userEmpleado').textContent = user.email;
-            }
-        } catch (e) {
-            console.log('Error buscando usuario:', e);
-            document.getElementById('userEmpleado').textContent = user.email;
-        }
-        
-        document.getElementById('loginButtons').style.display = 'none';
-        await cargarOrganigrama();
-    } else {
-        document.getElementById('userInfo').style.display = 'none';
-        document.getElementById('loginButtons').style.display = 'flex';
-        limpiarTodo();
-    }
-});
+        // MOSTRAR USUARIO DESDE SESSIONSTORAGE
+        document.addEventListener('DOMContentLoaded', function() {
+            const nombre = sessionStorage.getItem('usuarioNombre');
+            const emp = sessionStorage.getItem('usuarioEmpleado');
+            if (nombre) document.getElementById('userEmpleado').textContent = nombre;
+            else if (emp) document.getElementById('userEmpleado').textContent = emp;
+            else document.getElementById('userEmpleado').textContent = 'Usuario';
+            document.getElementById('userInfo').style.display = 'flex';
+            document.getElementById('loginButtons').style.display = 'none';
+            cargarOrganigrama();
+        });
 
-        function cerrarSesion() {
-            auth.signOut().then(() => {
-                window.location.href = 'login.html';
-            });
-        }
+        function cerrarSesion() { sessionStorage.clear(); window.location.href = 'login.html'; }
 
         async function cargarOrganigrama() {
             try {
-                const snapshot = await db.collection('organigrama').doc('lista_cecos').get();
-                if (snapshot.exists) {
-                    const data = snapshot.data();
-                    datosOrganigrama = data.datosCompletos || [];
-                    console.log(`✅ Organigrama cargado: ${datosOrganigrama.length} registros`);
-                } else {
-                    datosOrganigrama = [];
-                }
-            } catch (error) {
-                datosOrganigrama = [];
-            }
+                const snap = await db.collection('organigrama').doc('lista_cecos').get();
+                if (snap.exists) datosOrganigrama = snap.data().datosCompletos || [];
+            } catch (e) { datosOrganigrama = []; }
         }
 
         function obtenerDatosTienda(ceco) {
-            if (!datosOrganigrama || datosOrganigrama.length === 0) {
-                return { nombre: '', marca: '' };
-            }
-            const tienda = datosOrganigrama.find(item => String(item.ceco).trim() === String(ceco).trim());
-            return tienda ? { nombre: tienda.tienda || '', marca: tienda.marca || '' } : { nombre: '', marca: '' };
+            if (!datosOrganigrama.length) return { nombre: '', marca: '' };
+            const t = datosOrganigrama.find(i => String(i.ceco).trim() === String(ceco).trim());
+            return t ? { nombre: t.tienda || '', marca: t.marca || '' } : { nombre: '', marca: '' };
         }
 
         async function buscarRegistro() {
-            const bitacora = document.getElementById('buscarBitacora').value.trim();
-            if (!bitacora) {
-                mostrarError('⚠️ Ingresa un número de bitácora');
-                return;
-            }
+            const bit = document.getElementById('buscarBitacora').value.trim();
+            if (!bit) { mostrarError('⚠️ Ingresa número'); return; }
             mostrarLoader();
             try {
-                const snapshot = await db.collection('registros')
-                    .where('datosGenerales.bitacora', '==', bitacora)
-                    .get();
-
-                if (snapshot.empty) {
-                    ocultarLoader();
-                    mostrarError('❌ No se encontró ningún registro');
-                    ocultarTodo();
-                    registroActual = null;
-                    documentoIdActual = null;
-                    return;
+                const snap = await db.collection('registros').where('datosGenerales.bitacora', '==', bit).get();
+                if (snap.empty) {
+                    ocultarLoader(); mostrarError('❌ No encontrado'); ocultarTodo();
+                    registroActual = null; documentoIdActual = null; return;
                 }
-
-                snapshot.forEach(doc => {
-                    registroActual = doc.data();
-                    documentoIdActual = doc.id;
-                });
-
+                snap.forEach(d => { registroActual = d.data(); documentoIdActual = d.id; });
                 if (registroActual.validacion) {
-                    esModoEdicion = false;
-                    document.getElementById('validadoMessage').style.display = 'block';
-                    document.getElementById('btnValidar').disabled = true;
-                    bloquearCampos(true);
+                    esModoEdicion = false; document.getElementById('validadoMessage').style.display = 'block';
+                    document.getElementById('btnValidar').disabled = true; bloquearCampos(true);
                     cargarDatosValidacion(registroActual);
                 } else {
-                    esModoEdicion = true;
-                    document.getElementById('validadoMessage').style.display = 'none';
-                    document.getElementById('btnValidar').disabled = false;
-                    bloquearCampos(false);
+                    esModoEdicion = true; document.getElementById('validadoMessage').style.display = 'none';
+                    document.getElementById('btnValidar').disabled = false; bloquearCampos(false);
                 }
-
-                mostrarRegistro(registroActual);
-                ocultarError();
-
-            } catch (error) {
-                mostrarError('❌ Error: ' + error.message);
-            } finally {
-                ocultarLoader();
-            }
+                mostrarRegistro(registroActual); ocultarError();
+            } catch (e) { mostrarError('❌ Error: ' + e.message); } finally { ocultarLoader(); }
         }
 
-        function bloquearCampos(bloquear) {
-            const campos = [
-                'validador', 'transporte', 'firmada', 'sellada', 
-                'fechaBitacora', 'noOperador', 'noViaje', 'boleta',
-                'comentariosValidacion'
-            ];
-            
-            campos.forEach(id => {
-                const elemento = document.getElementById(id);
-                if (elemento) elemento.disabled = bloquear;
-            });
+        function bloquearCampos(b) {
+            ['validador','transporte','firmada','sellada','fechaBitacora','noOperador','noViaje','boleta','comentariosValidacion']
+                .forEach(id => { const el = document.getElementById(id); if(el) el.disabled = b; });
         }
 
-        function mostrarRegistro(registro) {
-    document.getElementById('verNoEmpleado').textContent = registro.datosGenerales?.noEmpleado || 'S/N';
-    document.getElementById('verRuta').textContent = registro.datosGenerales?.ruta || 'S/N';
-    document.getElementById('verBitacora').textContent = registro.datosGenerales?.bitacora || 'S/N';
-    document.getElementById('verUnidad').textContent = registro.datosGenerales?.unidad || 'S/N';
-    
-    document.getElementById('datosBitacora').style.display = 'block';
-    document.getElementById('tablaSection').style.display = 'block';
+        function mostrarRegistro(r) {
+            document.getElementById('verNoEmpleado').textContent = r.datosGenerales?.noEmpleado||'S/N';
+            document.getElementById('verRuta').textContent = r.datosGenerales?.ruta||'S/N';
+            document.getElementById('verBitacora').textContent = r.datosGenerales?.bitacora||'S/N';
+            document.getElementById('verUnidad').textContent = r.datosGenerales?.unidad||'S/N';
+            document.getElementById('datosBitacora').style.display = 'block';
+            document.getElementById('tablaSection').style.display = 'block';
 
-    const tbody = document.getElementById('tablaBody');
-    tbody.innerHTML = '';
-
-    if (registro.registros && registro.registros.length > 0) {
-        registro.registros.forEach((tienda, index) => {
-            const datos = obtenerDatosTienda(tienda.tienda);
-            
-            const fila = document.createElement('tr');
-            
-            // Badge para la marca (solo para visualización)
-            let badgeClass = '';
-            const marca = (datos.marca || '').toUpperCase();
-            if (marca.includes('DOMINO')) {
-                badgeClass = 'badge-dominos';
-            } else if (marca.includes('STARBUCKS') || marca.includes('CHILIS')) {
-                badgeClass = 'badge-starbucks';
+            const tbody = document.getElementById('tablaBody');
+            tbody.innerHTML = '';
+            if (r.registros && r.registros.length) {
+                r.registros.forEach((t, i) => {
+                    const d = obtenerDatosTienda(t.tienda);
+                    const badge = (d.marca||'').toUpperCase().includes('DOMINO') ? 'badge-dominos' : 'badge-starbucks';
+                    const rem = r.validacion?.tiendas?.[i]?.remision||'';
+                    const com = r.validacion?.tiendas?.[i]?.complemento||'';
+                    tbody.innerHTML += `<tr>
+                        <td>${t.tienda||''}</td>
+                        <td>${d.nombre||''}</td>
+                        <td><span class="badge ${badge}">${d.marca||''}</span></td>
+                        <td><input type="text" class="table-input" value="${rem}" placeholder="Remisión" id="remision_${i}" ${!esModoEdicion?'disabled':''}></td>
+                        <td><input type="text" class="table-input" value="${com}" placeholder="Complemento" id="complemento_${i}" ${!esModoEdicion?'disabled':''}></td>
+                        <td>${t.cantidadBitacora||0}</td>
+                        <td>${t.diferencia||0}</td>
+                        <td><strong>${t.cantidadFisica||0}</strong></td>
+                    </tr>`;
+                });
             }
-            
-            const remisionPrev = (registro.validacion?.tiendas?.[index]?.remision) || '';
-            const complementoPrev = (registro.validacion?.tiendas?.[index]?.complemento) || '';
-            
-            // ORDEN CORREGIDO: CECO, NOMBRE TIENDA, MARCA, REMISIÓN, COMPLEMENTO, CANTIDAD, DIFERENCIA, CNT. FÍSICA
-            fila.innerHTML = `
-                <td>${tienda.tienda || ''}</td>
-                <td>${datos.nombre || ''}</td>
-                <td><span class="badge ${badgeClass}">${datos.marca || ''}</span></td>
-                <td><input type="text" class="table-input" value="${remisionPrev}" placeholder="Remisión" id="remision_${index}" ${!esModoEdicion ? 'disabled' : ''}></td>
-                <td><input type="text" class="table-input" value="${complementoPrev}" placeholder="Complemento" id="complemento_${index}" ${!esModoEdicion ? 'disabled' : ''}></td>
-                <td>${tienda.cantidadBitacora || 0}</td>
-                <td>${tienda.diferencia || 0}</td>
-                <td><strong>${tienda.cantidadFisica || 0}</strong></td>
-            `;
-            tbody.appendChild(fila);
-        });
-    }
+            if (r.validacion) cargarDatosValidacion(r);
+        }
 
-    if (registro.validacion) {
-        document.getElementById('validador').value = registro.validacion.validador || '';
-        document.getElementById('transporte').value = registro.validacion.transporte || '';
-        document.getElementById('firmada').checked = registro.validacion.firmada || false;
-        document.getElementById('sellada').checked = registro.validacion.sellada || false;
-        document.getElementById('fechaBitacora').value = registro.validacion.fechaBitacora || '';
-        document.getElementById('noOperador').value = registro.validacion.noOperador || '';
-        document.getElementById('noViaje').value = registro.validacion.noViaje || '';
-        document.getElementById('boleta').value = registro.validacion.boleta || '';
-        document.getElementById('comentariosValidacion').value = registro.validacion.comentarios || '';
-    }
-}
+        function cargarDatosValidacion(r) {
+            if (r.validacion) {
+                document.getElementById('validador').value = r.validacion.validador||'';
+                document.getElementById('transporte').value = r.validacion.transporte||'';
+                document.getElementById('firmada').checked = r.validacion.firmada||false;
+                document.getElementById('sellada').checked = r.validacion.sellada||false;
+                document.getElementById('fechaBitacora').value = r.validacion.fechaBitacora||'';
+                document.getElementById('noOperador').value = r.validacion.noOperador||'';
+                document.getElementById('noViaje').value = r.validacion.noViaje||'';
+                document.getElementById('boleta').value = r.validacion.boleta||'';
+                document.getElementById('comentariosValidacion').value = r.validacion.comentarios||'';
+            }
+        }
 
         async function guardarValidacion() {
-            if (!documentoIdActual) {
-                alert('❌ Primero busca una bitácora');
-                return;
-            }
-
-            if (!auth.currentUser) {
-                alert('❌ Debes iniciar sesión');
-                return;
-            }
-
-            if (!esModoEdicion) {
-                alert('❌ Esta bitácora ya está validada');
-                return;
-            }
-
-            mostrarLoader('Guardando validación...');
-
+            if (!documentoIdActual) { alert('❌ Primero busca una bitácora'); return; }
+            if (!esModoEdicion) { alert('❌ Ya validada'); return; }
+            mostrarLoader('Guardando...');
             try {
-                const tiendasValidacion = [];
-                const filas = document.querySelectorAll('#tablaBody tr');
-                
-                filas.forEach((fila, index) => {
-                    const remision = document.getElementById(`remision_${index}`)?.value || '';
-                    const complemento = document.getElementById(`complemento_${index}`)?.value || '';
-                    tiendasValidacion.push({ remision, complemento });
+                const tiendas = [];
+                document.querySelectorAll('#tablaBody tr').forEach((f,i) => {
+                    tiendas.push({
+                        remision: document.getElementById(`remision_${i}`)?.value||'',
+                        complemento: document.getElementById(`complemento_${i}`)?.value||''
+                    });
                 });
-
-                const validacionData = {
-                    validador: document.getElementById('validador').value.trim() || 'Validador',
-                    transporte: document.getElementById('transporte').value.trim() || '',
+                const v = {
+                    validador: document.getElementById('validador').value.trim()||'Validador',
+                    transporte: document.getElementById('transporte').value.trim()||'',
                     firmada: document.getElementById('firmada').checked,
                     sellada: document.getElementById('sellada').checked,
-                    fechaBitacora: document.getElementById('fechaBitacora').value || '',
-                    noOperador: document.getElementById('noOperador').value.trim() || '',
-                    noViaje: document.getElementById('noViaje').value.trim() || '',
-                    boleta: document.getElementById('boleta').value.trim() || '',
-                    comentarios: document.getElementById('comentariosValidacion').value.trim() || '',
-                    tiendas: tiendasValidacion,
-                    fechaValidacion: new Date().toLocaleString(),
-                    validadoPor: auth.currentUser.email
+                    fechaBitacora: document.getElementById('fechaBitacora').value||'',
+                    noOperador: document.getElementById('noOperador').value.trim()||'',
+                    noViaje: document.getElementById('noViaje').value.trim()||'',
+                    boleta: document.getElementById('boleta').value.trim()||'',
+                    comentarios: document.getElementById('comentariosValidacion').value.trim()||'',
+                    tiendas, fechaValidacion: new Date().toLocaleString()
                 };
-
-                await db.collection('registros').doc(documentoIdActual).update({
-                    validacion: validacionData
-                });
-
-                ocultarLoader();
-                alert('✅ Validación guardada correctamente');
-                
+                await db.collection('registros').doc(documentoIdActual).update({ validacion: v });
+                ocultarLoader(); alert('✅ Validación guardada');
                 esModoEdicion = false;
                 document.getElementById('validadoMessage').style.display = 'block';
                 document.getElementById('btnValidar').disabled = true;
                 bloquearCampos(true);
-
-            } catch (error) {
-                ocultarLoader();
-                alert('❌ Error al guardar: ' + error.message);
-            }
+            } catch (e) { ocultarLoader(); alert('❌ Error: ' + e.message); }
         }
 
-        function mostrarLoader(mensaje = 'Procesando...') {
-            document.querySelector('.loader-text').textContent = mensaje;
-            document.getElementById('loaderOverlay').style.display = 'flex';
-        }
-
-        function ocultarLoader() {
-            document.getElementById('loaderOverlay').style.display = 'none';
-        }
-
-        function mostrarError(mensaje) {
-            document.getElementById('mensajeError').textContent = mensaje;
-            document.getElementById('mensajeError').style.display = 'block';
-        }
-
-        function ocultarError() {
-            document.getElementById('mensajeError').style.display = 'none';
-        }
-
+        function mostrarLoader() { document.getElementById('loaderOverlay').style.display = 'flex'; }
+        function ocultarLoader() { document.getElementById('loaderOverlay').style.display = 'none'; }
+        function mostrarError(m) { document.getElementById('mensajeError').textContent = m; document.getElementById('mensajeError').style.display = 'block'; }
+        function ocultarError() { document.getElementById('mensajeError').style.display = 'none'; }
         function ocultarTodo() {
             document.getElementById('datosBitacora').style.display = 'none';
             document.getElementById('tablaSection').style.display = 'none';
             document.getElementById('validadoMessage').style.display = 'none';
         }
-
-        function limpiarTodo() {
-            document.getElementById('buscarBitacora').value = '';
-            document.getElementById('validador').value = '';
-            document.getElementById('transporte').value = '';
-            document.getElementById('firmada').checked = true;
-            document.getElementById('sellada').checked = true;
-            document.getElementById('fechaBitacora').value = '';
-            document.getElementById('noOperador').value = '';
-            document.getElementById('noViaje').value = '';
-            document.getElementById('boleta').value = '';
-            document.getElementById('comentariosValidacion').value = '';
-            ocultarTodo();
-            document.getElementById('btnValidar').disabled = false;
-            esModoEdicion = true;
-        }
-
-        // Función de depuración
-        setTimeout(() => {
-            console.log('🔍 DATOS ACTUALES:');
-            console.log('datosOrganigrama:', datosOrganigrama);
-            console.log('Cantidad:', datosOrganigrama.length);
-            if (datosOrganigrama.length > 0) {
-                console.log('Primer ceco:', datosOrganigrama[0].ceco);
-                console.log('Primer tienda:', datosOrganigrama[0].tienda);
-                console.log('Primer marca:', datosOrganigrama[0].marca);
-            }
-        }, 3000);
     </script>
-<script>
-// ============================================
-// FORZAR CARGA DE ORGANIGRAMA - SOLUCIÓN DEFINITIVA
-// ============================================
-(async function() {
-    console.log('🚀 FORZANDO CARGA DE ORGANIGRAMA...');
-    try {
-        const snap = await db.collection('organigrama').doc('lista_cecos').get();
-        if(snap.exists) {
-            window.datosOrganigrama = snap.data().datosCompletos || [];
-            console.log(`✅ CARGADOS ${window.datosOrganigrama.length} REGISTROS`);
-            
-            // Asignar también a la variable global del script
-            if(typeof datosOrganigrama !== 'undefined') {
-                datosOrganigrama = window.datosOrganigrama;
-            }
-        } else {
-            console.log('❌ No existe el documento');
-        }
-    } catch(e) {
-        console.error('❌ Error:', e);
-    }
-})();
-
-// Verificar cada 2 segundos
-setInterval(() => {
-    console.log('📊 datosOrganigrama:', datosOrganigrama?.length || 0, 'registros');
-}, 2000);
-</script>
 </body>
 </html>
