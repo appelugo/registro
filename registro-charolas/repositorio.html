@@ -490,20 +490,25 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="header-left">
-                <img src="logo.png" alt="Logo" style="height: 50px; width: auto;">
-                <h1>Registro de <span>Charolas</span></h1>
-            </div>
-            <div class="btn-group">
-                <button class="btn btn-info" onclick="window.location.href='formulario.html'">
-                    📝 NUEVO REGISTRO
-                </button>
-                <button class="btn btn-primary" onclick="cargarDatos()">
-                    🔄 ACTUALIZAR
-                </button>
-            </div>
-        </div>
+    <div class="header-left">
+        <img src="logo.png" alt="Logo" style="height: 50px; width: auto;">
+        <h1>Registro de <span>Charolas</span></h1>
+    </div>
+    <div class="btn-group">
+        <button class="btn btn-info" onclick="window.location.href='formulario.html'">
+            📝 NUEVO REGISTRO
+        </button>
+        <!-- Botón de eliminar con icono 🗑️ al lado de nuevo registro -->
+        <button class="btn btn-danger" onclick="toggleModoEliminacion()" id="btnEliminarHeader" style="padding: 8px 12px;">
+            🗑️
+        </button>
+    </div>
+</div>
 
+<!-- Fecha de actualización debajo de los botones -->
+<div style="text-align: right; margin-top: -15px; margin-bottom: 15px;">
+    <span style="color: var(--secondary); font-size: 0.75rem;" id="fechaActualizacion"></span>
+</div>
         <div class="stats-container" id="statsContainer">
             <div class="stat-card">
                 <div class="stat-label">Registros HOY</div>
@@ -527,35 +532,13 @@
             </div>
         </div>
 
-        <div class="filtro-fechas">
-            <div class="filtro-item">
-                <label>FECHA INICIO</label>
-                <input type="date" id="fechaInicio" value="">
-            </div>
-            <div class="filtro-item">
-                <label>FECHA FIN</label>
-                <input type="date" id="fechaFin" value="">
-            </div>
-            <div class="btn-group" style="margin-left: auto;">
-                <button class="btn btn-success" onclick="exportarExcelConFechas()">
-                    📥 EXPORTAR A EXCEL
-                </button>
-                <button class="btn btn-warning" onclick="toggleModoEliminacion()" id="btnEliminar">
-                    🔐 ELIMINAR REGISTROS
-                </button>
-            </div>
-        </div>
-
         <div class="action-bar">
-            <div>
-                <span style="color: var(--secondary); font-size: 0.8rem;" id="fechaActualizacion"></span>
-            </div>
-            <div class="btn-group" id="botonesEliminarTodo" style="display: none;">
-                <button class="btn btn-danger" onclick="eliminarTodosRegistros()">
-                    🗑️ ELIMINAR TODOS
-                </button>
-            </div>
-        </div>
+    <div class="btn-group" id="botonesEliminarTodo" style="display: none;">
+        <button class="btn btn-danger" onclick="eliminarTodosRegistros()">
+            🗑️ ELIMINAR TODOS
+        </button>
+    </div>
+</div>
 
         <div class="table-responsive">
             <table id="tablaRepositorio">
@@ -1143,12 +1126,23 @@
         // INICIALIZAR
         // ============================================
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('fechaInicio').value = '';
-            document.getElementById('fechaFin').value = '';
             cargarDatos();
             ocultarBotonesEliminar();
+// ============================================
+// MANEJAR BOTÓN DE ELIMINAR DEL HEADER
+// ============================================
+document.addEventListener('DOMContentLoaded', function() {
+    const btnEliminarHeader = document.getElementById('btnEliminarHeader');
+    if (btnEliminarHeader) {
+        btnEliminarHeader.addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleModoEliminacion();
+        });
+    }
+});
             setInterval(cargarDatos, 60000);
         });
     </script>
 </body>
+
 </html>
