@@ -653,36 +653,45 @@
         }
 
         // ============================================
-        // CARGAR ORGANIGRAMA - CORREGIDO (USA datosCompletos)
-        // ============================================
-        async function cargarOrganigrama() {
-            console.log('🔍 Cargando organigrama...');
-            try {
-                const snapshot = await db.collection('organigrama').doc('lista_cecos').get();
+// CARGAR ORGANIGRAMA - VERSIÓN CORREGIDA
+// ============================================
+async function cargarOrganigrama() {
+    console.log('🔍 Cargando organigrama desde Firebase...');
+    try {
+        const snapshot = await db.collection('organigrama').doc('lista_cecos').get();
+        
+        if (snapshot.exists) {
+            const data = snapshot.data();
+            console.log('✅ Documento encontrado');
+            
+            // ASIGNAR CORRECTAMENTE los datos a la variable global
+            if (data.datosCompletos && Array.isArray(data.datosCompletos)) {
+                datosOrganigrama = data.datosCompletos;
+                console.log(`✅ Organigrama cargado: ${datosOrganigrama.length} registros`);
                 
-                if (snapshot.exists) {
-                    const data = snapshot.data();
-                    
-                    if (data.datosCompletos && Array.isArray(data.datosCompletos)) {
-                        datosOrganigrama = data.datosCompletos;
-                        console.log(`✅ Organigrama cargado: ${datosOrganigrama.length} registros`);
-                        
-                        if (datosOrganigrama.length > 0) {
-                            console.log('📋 Primer registro:', datosOrganigrama[0]);
-                        }
-                    } else {
-                        console.log('⚠️ No hay datosCompletos');
-                        datosOrganigrama = [];
-                    }
-                } else {
-                    console.log('❌ Documento no existe');
-                    datosOrganigrama = [];
+                // Mostrar ejemplo para verificar
+                if (datosOrganigrama.length > 0) {
+                    console.log('📋 Primer registro:', datosOrganigrama[0]);
+                    console.log('   - ceco:', datosOrganigrama[0].ceco);
+                    console.log('   - tienda:', datosOrganigrama[0].tienda);
+                    console.log('   - marca:', datosOrganigrama[0].marca);
                 }
-            } catch (error) {
-                console.error('❌ Error:', error);
+            } else {
+                console.log('⚠️ El documento no tiene datosCompletos');
                 datosOrganigrama = [];
             }
+        } else {
+            console.log('❌ El documento lista_cecos NO existe');
+            datosOrganigrama = [];
         }
+    } catch (error) {
+        console.error('❌ Error cargando organigrama:', error);
+        datosOrganigrama = [];
+    }
+    
+    // Verificar que quedó asignado
+    console.log('📊 Variable datosOrganigrama actualizada:', datosOrganigrama.length, 'registros');
+}
 
         // ============================================
         // OBTENER DATOS DE TIENDA (USA datosCompletos)
@@ -1021,4 +1030,5 @@ setTimeout(verificarOrganigrama, 3000);
 </script>
 </body>
 </html>
+
 
