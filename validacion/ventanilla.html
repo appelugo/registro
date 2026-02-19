@@ -9,6 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <style>
+        /* (Mantén los mismos estilos que ya tienes) */
         * {
             margin: 0;
             padding: 0;
@@ -51,9 +52,6 @@
             height: calc(100vh - 24px);
         }
 
-        /* ============================================ */
-        /* HEADER FIJO                                   */
-        /* ============================================ */
         .header-fijo {
             flex-shrink: 0;
             background-color: var(--white);
@@ -140,9 +138,6 @@
             box-shadow: none;
         }
 
-        /* ============================================ */
-        /* BOTONES                                       */
-        /* ============================================ */
         .btn {
             padding: 4px 10px;
             border: none;
@@ -177,9 +172,6 @@
             background-color: #C0392B;
         }
 
-        /* ============================================ */
-        /* FORMULARIO PRINCIPAL                          */
-        /* ============================================ */
         .form-principal {
             background: linear-gradient(to right, var(--light), var(--white));
             padding: 8px 12px;
@@ -251,14 +243,6 @@
             margin: 0;
         }
 
-        .campo-group input:disabled,
-        .campo-group .valor:disabled {
-            background-color: #F0F4F8;
-            color: var(--text-dark);
-            border-color: #D5DBDB;
-        }
-
-        /* Buscador integrado */
         .busqueda-integrada {
             display: flex;
             gap: 3px;
@@ -295,7 +279,6 @@
             cursor: not-allowed;
         }
 
-        /* Fila de comentarios */
         .fila-comentario {
             margin-top: 6px;
             display: grid;
@@ -303,9 +286,6 @@
             gap: 6px;
         }
 
-        /* ============================================ */
-        /* MENSAJES                                      */
-        /* ============================================ */
         .validado-message {
             background-color: rgba(39, 174, 96, 0.1);
             color: var(--success);
@@ -327,9 +307,6 @@
             border-left: 4px solid var(--danger);
         }
 
-        /* ============================================ */
-        /* TABLA CON CAMPOS EDITABLES                   */
-        /* ============================================ */
         .tabla-section {
             margin-top: 10px;
         }
@@ -414,9 +391,6 @@
             border: 1px solid #006241;
         }
 
-        /* ============================================ */
-        /* LOADER                                        */
-        /* ============================================ */
         .loader-overlay {
             position: fixed;
             top: 0;
@@ -555,15 +529,12 @@
 
         <!-- SECCIÓN DESPLAZABLE -->
         <div class="scrollable" style="flex: 1; overflow-y: auto; padding-right: 5px;">
-            <!-- MENSAJE DE VALIDADO -->
             <div id="validadoMessage" class="validado-message" style="display: none;">
                 ✅ Esta bitácora ya fue validada
             </div>
-
-            <!-- MENSAJE DE ERROR -->
             <div id="mensajeError" class="mensaje-error" style="display: none;"></div>
 
-            <!-- DATOS DE BITÁCORA (solo lectura) -->
+            <!-- DATOS DE BITÁCORA -->
             <div class="form-principal" id="datosBitacora" style="display: none;">
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
                     <div class="campo-group">
@@ -608,7 +579,6 @@
             </div>
         </div>
 
-        <!-- FOOTER -->
         <div class="footer">
             Sistema de Validación de Registro de charolas V2.0 | E.Lugo 2026
         </div>
@@ -683,16 +653,15 @@
         }
 
         // ============================================
-        // CARGAR ORGANIGRAMA - VERSIÓN CORREGIDA
+        // CARGAR ORGANIGRAMA - CORREGIDO (USA datosCompletos)
         // ============================================
         async function cargarOrganigrama() {
-            console.log('🔍 Intentando cargar organigrama...');
+            console.log('🔍 Cargando organigrama...');
             try {
                 const snapshot = await db.collection('organigrama').doc('lista_cecos').get();
                 
                 if (snapshot.exists) {
                     const data = snapshot.data();
-                    console.log('✅ Documento encontrado');
                     
                     if (data.datosCompletos && Array.isArray(data.datosCompletos)) {
                         datosOrganigrama = data.datosCompletos;
@@ -702,21 +671,21 @@
                             console.log('📋 Primer registro:', datosOrganigrama[0]);
                         }
                     } else {
-                        console.log('⚠️ El documento no tiene datosCompletos');
+                        console.log('⚠️ No hay datosCompletos');
                         datosOrganigrama = [];
                     }
                 } else {
-                    console.log('❌ El documento lista_cecos NO existe');
+                    console.log('❌ Documento no existe');
                     datosOrganigrama = [];
                 }
             } catch (error) {
-                console.error('❌ Error cargando organigrama:', error);
+                console.error('❌ Error:', error);
                 datosOrganigrama = [];
             }
         }
 
         // ============================================
-        // OBTENER DATOS DE TIENDA POR CECO - CORREGIDO
+        // OBTENER DATOS DE TIENDA (USA datosCompletos)
         // ============================================
         function obtenerDatosTienda(ceco) {
             if (!datosOrganigrama || datosOrganigrama.length === 0) {
@@ -725,23 +694,15 @@
             }
             
             const cecoStr = String(ceco).trim();
-            console.log('🔍 Buscando CECO:', cecoStr);
+            const tienda = datosOrganigrama.find(item => String(item.ceco).trim() === cecoStr);
             
-            const tiendaEncontrada = datosOrganigrama.find(item => {
-                const itemCeco = item.ceco ? String(item.ceco).trim() : '';
-                return itemCeco === cecoStr;
-            });
-            
-            if (tiendaEncontrada) {
-                console.log('✅ Tienda encontrada:', tiendaEncontrada);
+            if (tienda) {
                 return {
-                    nombre: tiendaEncontrada.tienda || '',
-                    marca: tiendaEncontrada.marca || ''
+                    nombre: tienda.tienda || '',
+                    marca: tienda.marca || ''
                 };
-            } else {
-                console.log('❌ No se encontró el CECO:', cecoStr);
-                return { nombre: '', marca: '' };
             }
+            return { nombre: '', marca: '' };
         }
 
         // ============================================
@@ -800,7 +761,7 @@
         }
 
         // ============================================
-        // BLOQUEAR/DESBLOQUEAR CAMPOS
+        // BLOQUEAR CAMPOS
         // ============================================
         function bloquearCampos(bloquear) {
             const campos = [
@@ -811,14 +772,12 @@
             
             campos.forEach(id => {
                 const elemento = document.getElementById(id);
-                if (elemento) {
-                    elemento.disabled = bloquear;
-                }
+                if (elemento) elemento.disabled = bloquear;
             });
         }
 
         // ============================================
-        // MOSTRAR REGISTRO - CORREGIDO
+        // MOSTRAR REGISTRO
         // ============================================
         function mostrarRegistro(registro) {
             document.getElementById('verNoEmpleado').textContent = registro.datosGenerales?.noEmpleado || 'S/N';
@@ -839,19 +798,20 @@
                     const fila = document.createElement('tr');
                     
                     let badgeClass = '';
-                    if (datos.marca.toUpperCase().includes('DOMINO')) {
+                    const marca = (datos.marca || '').toUpperCase();
+                    if (marca.includes('DOMINO')) {
                         badgeClass = 'badge-dominos';
-                    } else if (datos.marca.toUpperCase().includes('STARBUCKS') || datos.marca.toUpperCase().includes('CHILIS')) {
+                    } else if (marca.includes('STARBUCKS') || marca.includes('CHILIS')) {
                         badgeClass = 'badge-starbucks';
                     }
                     
-                    const remisionPrev = (registro.validacion?.tiendas && registro.validacion.tiendas[index]?.remision) || '';
-                    const complementoPrev = (registro.validacion?.tiendas && registro.validacion.tiendas[index]?.complemento) || '';
+                    const remisionPrev = (registro.validacion?.tiendas?.[index]?.remision) || '';
+                    const complementoPrev = (registro.validacion?.tiendas?.[index]?.complemento) || '';
                     
                     fila.innerHTML = `
                         <td>${tienda.tienda || ''}</td>
                         <td><span class="badge ${badgeClass}">${datos.marca || ''}</span></td>
-                        <td><span class="texto-tabla">${datos.nombre || ''}</span></td>
+                        <td><span>${datos.nombre || ''}</span></td>
                         <td><input type="text" class="table-input" value="${remisionPrev}" placeholder="Remisión" id="remision_${index}" ${!esModoEdicion ? 'disabled' : ''}></td>
                         <td><input type="text" class="table-input" value="${complementoPrev}" placeholder="Complemento" id="complemento_${index}" ${!esModoEdicion ? 'disabled' : ''}></td>
                         <td>${tienda.cantidadBitacora || 0}</td>
@@ -890,7 +850,7 @@
             }
 
             if (!esModoEdicion) {
-                alert('❌ Esta bitácora ya está validada y no puede modificarse');
+                alert('❌ Esta bitácora ya está validada');
                 return;
             }
 
@@ -998,19 +958,6 @@
             document.getElementById('btnValidar').disabled = false;
             esModoEdicion = true;
         }
-
-        // ============================================
-        // FUNCIÓN DE PRUEBA - EJECUTAR AL INICIO
-        // ============================================
-        setTimeout(() => {
-            console.log('🔍 Verificando organigrama automáticamente...');
-            if (datosOrganigrama.length > 0) {
-                console.log('✅ datosOrganigrama tiene', datosOrganigrama.length, 'registros');
-                console.log('Primer registro:', datosOrganigrama[0]);
-            } else {
-                console.log('❌ datosOrganigrama está vacío');
-            }
-        }, 3000);
     </script>
 </body>
 </html>
