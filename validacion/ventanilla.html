@@ -9,7 +9,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <style>
-        /* (Mantén todos tus estilos actuales) */
         * {
             margin: 0;
             padding: 0;
@@ -465,9 +464,7 @@
 
             <!-- FORMULARIO PRINCIPAL -->
             <div class="form-principal">
-                <!-- Primera fila: 7 columnas -->
                 <div class="fila-campos">
-                    <!-- Buscador integrado -->
                     <div class="busqueda-integrada">
                         <div class="campo-group">
                             <label>🔍 BITÁCORA</label>
@@ -476,44 +473,37 @@
                         <button class="btn-lupa" id="btnBuscar" onclick="buscarRegistro()">🔍</button>
                     </div>
 
-                    <!-- VALIDADOR -->
                     <div class="campo-group">
                         <label>VALIDADOR</label>
                         <input type="text" id="validador" placeholder="Validador">
                     </div>
 
-                    <!-- TRANSPORTE -->
                     <div class="campo-group">
                         <label>TRANSPORTE</label>
                         <input type="text" id="transporte" placeholder="Transporte">
                     </div>
 
-                    <!-- CHECKBOX en columna -->
                     <div class="campo-group check-group">
                         <label><input type="checkbox" id="firmada" checked> FIRMADA</label>
                         <label><input type="checkbox" id="sellada" checked> SELLADA</label>
                     </div>
 
-                    <!-- FECHA -->
                     <div class="campo-group">
                         <label>FECHA</label>
                         <input type="date" id="fechaBitacora">
                     </div>
 
-                    <!-- NO. OPERADOR -->
                     <div class="campo-group">
                         <label>OPERADOR</label>
                         <input type="text" id="noOperador" placeholder="Operador">
                     </div>
 
-                    <!-- NO. VIAJE -->
                     <div class="campo-group">
                         <label>VIAJE</label>
                         <input type="text" id="noViaje" placeholder="Viaje">
                     </div>
                 </div>
 
-                <!-- Segunda fila: BOLETA + COMENTARIOS -->
                 <div class="fila-comentario">
                     <div class="campo-group">
                         <label>BOLETA</label>
@@ -521,7 +511,7 @@
                     </div>
                     <div class="campo-group">
                         <label>COMENTARIOS</label>
-                        <input type="text" id="comentariosValidacion" placeholder="Observaciones de la validación">
+                        <input type="text" id="comentariosValidacion" placeholder="Observaciones">
                     </div>
                 </div>
             </div>
@@ -534,7 +524,6 @@
             </div>
             <div id="mensajeError" class="mensaje-error" style="display: none;"></div>
 
-            <!-- DATOS DE BITÁCORA -->
             <div class="form-principal" id="datosBitacora" style="display: none;">
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
                     <div class="campo-group">
@@ -556,7 +545,6 @@
                 </div>
             </div>
 
-            <!-- TABLA DE TIENDAS -->
             <div id="tablaSection" style="display: none;" class="tabla-section">
                 <h3>📋 VALIDACIÓN DE TIENDAS</h3>
                 <div class="table-responsive">
@@ -584,7 +572,6 @@
         </div>
     </div>
 
-    <!-- LOADER -->
     <div id="loaderOverlay" class="loader-overlay">
         <div class="loader-container">
             <div class="loader-spinner"></div>
@@ -592,17 +579,7 @@
         </div>
     </div>
 
-    <!-- BOTÓN DE DEPURACIÓN (TEMPORAL) -->
-    <div style="position: fixed; bottom: 10px; left: 10px; z-index: 9999;">
-        <button onclick="verificarOrganigrama()" style="background: #0A2342; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">
-            🔍 VERIFICAR ORGANIGRAMA
-        </button>
-    </div>
-
     <script>
-        // ============================================
-        // 🔥 CONFIGURACIÓN DE FIREBASE
-        // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyDD0lCq8rAnCm2KjsqSwzxlpUhQU2gRVfk",
             authDomain: "registro-charolas.firebaseapp.com",
@@ -621,9 +598,6 @@
         let datosOrganigrama = [];
         let esModoEdicion = true;
 
-        // ============================================
-        // VERIFICAR AUTENTICACIÓN
-        // ============================================
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 document.getElementById('userInfo').style.display = 'flex';
@@ -645,7 +619,6 @@
                 }
                 
                 document.getElementById('loginButtons').style.display = 'none';
-                // Cargar organigrama DESPUÉS de autenticar
                 await cargarOrganigrama();
             } else {
                 document.getElementById('userInfo').style.display = 'none';
@@ -660,81 +633,39 @@
             });
         }
 
-        // ============================================
-        // CARGAR ORGANIGRAMA - VERSIÓN CORREGIDA
-        // ============================================
         async function cargarOrganigrama() {
-            console.log('🔍 Cargando organigrama desde Firebase...');
+            console.log('🔍 Cargando organigrama...');
             try {
                 const snapshot = await db.collection('organigrama').doc('lista_cecos').get();
-                
                 if (snapshot.exists) {
                     const data = snapshot.data();
-                    console.log('✅ Documento encontrado');
-                    
-                    // ASIGNAR CORRECTAMENTE los datos a la variable global
                     if (data.datosCompletos && Array.isArray(data.datosCompletos)) {
                         datosOrganigrama = data.datosCompletos;
-                        console.log(`✅ Organigrama cargado: ${datosOrganigrama.length} registros`);
-                        
-                        // Mostrar ejemplo para verificar
-                        if (datosOrganigrama.length > 0) {
-                            console.log('📋 Primer registro:', datosOrganigrama[0]);
-                            console.log('   - ceco:', datosOrganigrama[0].ceco);
-                            console.log('   - tienda:', datosOrganigrama[0].tienda);
-                            console.log('   - marca:', datosOrganigrama[0].marca);
-                        }
+                        console.log(`✅ Cargados ${datosOrganigrama.length} registros`);
                     } else {
-                        console.log('⚠️ El documento no tiene datosCompletos');
                         datosOrganigrama = [];
                     }
                 } else {
-                    console.log('❌ El documento lista_cecos NO existe');
                     datosOrganigrama = [];
                 }
             } catch (error) {
-                console.error('❌ Error cargando organigrama:', error);
                 datosOrganigrama = [];
             }
-            
-            // Verificar que quedó asignado
-            console.log('📊 Variable datosOrganigrama actualizada:', datosOrganigrama.length, 'registros');
         }
 
-        // ============================================
-        // OBTENER DATOS DE TIENDA
-        // ============================================
         function obtenerDatosTienda(ceco) {
-            if (!datosOrganigrama || datosOrganigrama.length === 0) {
-                console.log('⚠️ Organigrama no disponible');
-                return { nombre: '', marca: '' };
-            }
-            
-            const cecoStr = String(ceco).trim();
-            const tienda = datosOrganigrama.find(item => String(item.ceco).trim() === cecoStr);
-            
-            if (tienda) {
-                return {
-                    nombre: tienda.tienda || '',
-                    marca: tienda.marca || ''
-                };
-            }
-            return { nombre: '', marca: '' };
+            if (!datosOrganigrama || datosOrganigrama.length === 0) return { nombre: '', marca: '' };
+            const tienda = datosOrganigrama.find(item => String(item.ceco).trim() === String(ceco).trim());
+            return tienda ? { nombre: tienda.tienda || '', marca: tienda.marca || '' } : { nombre: '', marca: '' };
         }
 
-        // ============================================
-        // BUSCAR REGISTRO
-        // ============================================
         async function buscarRegistro() {
             const bitacora = document.getElementById('buscarBitacora').value.trim();
-            
             if (!bitacora) {
                 mostrarError('⚠️ Ingresa un número de bitácora');
                 return;
             }
-
             mostrarLoader();
-
             try {
                 const snapshot = await db.collection('registros')
                     .where('datosGenerales.bitacora', '==', bitacora)
@@ -777,31 +708,19 @@
             }
         }
 
-        // ============================================
-        // BLOQUEAR CAMPOS
-        // ============================================
         function bloquearCampos(bloquear) {
-            const campos = [
-                'validador', 'transporte', 'firmada', 'sellada', 
-                'fechaBitacora', 'noOperador', 'noViaje', 'boleta',
-                'comentariosValidacion'
-            ];
-            
+            const campos = ['validador', 'transporte', 'firmada', 'sellada', 'fechaBitacora', 'noOperador', 'noViaje', 'boleta', 'comentariosValidacion'];
             campos.forEach(id => {
-                const elemento = document.getElementById(id);
-                if (elemento) elemento.disabled = bloquear;
+                const el = document.getElementById(id);
+                if (el) el.disabled = bloquear;
             });
         }
 
-        // ============================================
-        // MOSTRAR REGISTRO
-        // ============================================
         function mostrarRegistro(registro) {
             document.getElementById('verNoEmpleado').textContent = registro.datosGenerales?.noEmpleado || 'S/N';
             document.getElementById('verRuta').textContent = registro.datosGenerales?.ruta || 'S/N';
             document.getElementById('verBitacora').textContent = registro.datosGenerales?.bitacora || 'S/N';
             document.getElementById('verUnidad').textContent = registro.datosGenerales?.unidad || 'S/N';
-            
             document.getElementById('datosBitacora').style.display = 'block';
             document.getElementById('tablaSection').style.display = 'block';
 
@@ -811,16 +730,12 @@
             if (registro.registros && registro.registros.length > 0) {
                 registro.registros.forEach((tienda, index) => {
                     const datos = obtenerDatosTienda(tienda.tienda);
-                    
                     const fila = document.createElement('tr');
                     
                     let badgeClass = '';
                     const marca = (datos.marca || '').toUpperCase();
-                    if (marca.includes('DOMINO')) {
-                        badgeClass = 'badge-dominos';
-                    } else if (marca.includes('STARBUCKS') || marca.includes('CHILIS')) {
-                        badgeClass = 'badge-starbucks';
-                    }
+                    if (marca.includes('DOMINO')) badgeClass = 'badge-dominos';
+                    else if (marca.includes('STARBUCKS') || marca.includes('CHILIS')) badgeClass = 'badge-starbucks';
                     
                     const remisionPrev = (registro.validacion?.tiendas?.[index]?.remision) || '';
                     const complementoPrev = (registro.validacion?.tiendas?.[index]?.complemento) || '';
@@ -852,35 +767,21 @@
             }
         }
 
-        // ============================================
-        // GUARDAR VALIDACIÓN
-        // ============================================
         async function guardarValidacion() {
-            if (!documentoIdActual) {
-                alert('❌ Primero busca una bitácora');
-                return;
-            }
-
-            if (!auth.currentUser) {
-                alert('❌ Debes iniciar sesión');
-                return;
-            }
-
-            if (!esModoEdicion) {
-                alert('❌ Esta bitácora ya está validada');
-                return;
-            }
+            if (!documentoIdActual) { alert('❌ Primero busca una bitácora'); return; }
+            if (!auth.currentUser) { alert('❌ Debes iniciar sesión'); return; }
+            if (!esModoEdicion) { alert('❌ Esta bitácora ya está validada'); return; }
 
             mostrarLoader('Guardando validación...');
 
             try {
                 const tiendasValidacion = [];
                 const filas = document.querySelectorAll('#tablaBody tr');
-                
                 filas.forEach((fila, index) => {
-                    const remision = document.getElementById(`remision_${index}`)?.value || '';
-                    const complemento = document.getElementById(`complemento_${index}`)?.value || '';
-                    tiendasValidacion.push({ remision, complemento });
+                    tiendasValidacion.push({
+                        remision: document.getElementById(`remision_${index}`)?.value || '',
+                        complemento: document.getElementById(`complemento_${index}`)?.value || ''
+                    });
                 });
 
                 const validacionData = {
@@ -898,13 +799,9 @@
                     validadoPor: auth.currentUser.email
                 };
 
-                await db.collection('registros').doc(documentoIdActual).update({
-                    validacion: validacionData
-                });
-
+                await db.collection('registros').doc(documentoIdActual).update({ validacion: validacionData });
                 ocultarLoader();
                 alert('✅ Validación guardada correctamente');
-                
                 esModoEdicion = false;
                 document.getElementById('validadoMessage').style.display = 'block';
                 document.getElementById('btnValidar').disabled = true;
@@ -916,9 +813,6 @@
             }
         }
 
-        // ============================================
-        // CARGAR DATOS DE VALIDACIÓN EXISTENTE
-        // ============================================
         function cargarDatosValidacion(registro) {
             if (registro.validacion) {
                 document.getElementById('validador').value = registro.validacion.validador || '';
@@ -933,9 +827,6 @@
             }
         }
 
-        // ============================================
-        // FUNCIONES AUXILIARES
-        // ============================================
         function mostrarLoader(mensaje = 'Procesando...') {
             document.querySelector('.loader-text').textContent = mensaje;
             document.getElementById('loaderOverlay').style.display = 'flex';
@@ -974,43 +865,6 @@
             ocultarTodo();
             document.getElementById('btnValidar').disabled = false;
             esModoEdicion = true;
-        }
-
-        // ============================================
-        // FUNCIÓN DE DEPURACIÓN
-        // ============================================
-        async function verificarOrganigrama() {
-            console.log('🔍 VERIFICACIÓN MANUAL DE ORGANIGRAMA');
-            console.log('1. datosOrganigrama (variable local):', datosOrganigrama);
-            console.log('2. Cantidad de registros:', datosOrganigrama?.length || 0);
-            
-            if (datosOrganigrama && datosOrganigrama.length > 0) {
-                console.log('3. Primer registro:', datosOrganigrama[0]);
-                console.log('   - ceco:', datosOrganigrama[0].ceco);
-                console.log('   - tienda:', datosOrganigrama[0].tienda);
-                console.log('   - marca:', datosOrganigrama[0].marca);
-            } else {
-                console.log('❌ datosOrganigrama está vacío');
-                
-                console.log('5. Intentando carga directa desde Firebase...');
-                try {
-                    const snapshot = await db.collection('organigrama').doc('lista_cecos').get();
-                    if (snapshot.exists) {
-                        const data = snapshot.data();
-                        console.log('   ✅ Documento encontrado en Firebase');
-                        console.log('   datosCompletos:', data.datosCompletos);
-                        if (data.datosCompletos && data.datosCompletos.length > 0) {
-                            console.log('   Primer registro:', data.datosCompletos[0]);
-                        } else {
-                            console.log('   ❌ datosCompletos está vacío');
-                        }
-                    } else {
-                        console.log('   ❌ El documento NO existe');
-                    }
-                } catch (error) {
-                    console.error('   ❌ Error:', error);
-                }
-            }
         }
     </script>
 </body>
