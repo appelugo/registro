@@ -35,6 +35,7 @@
         .btn-validar-header:disabled { background:#95A5A6; cursor:not-allowed; }
         .btn-agregar { background:var(--success); color:white; border:none; border-radius:5px; padding:6px 15px; font-weight:600; font-size:0.75rem; cursor:pointer; margin-left:10px; }
         .btn-agregar:hover { background:#219A53; }
+        .btn-agregar:disabled { background:#95A5A6; cursor:not-allowed; }
         .btn { padding:4px 10px; border:none; border-radius:5px; font-weight:600; font-size:0.7rem; text-transform:uppercase; cursor:pointer; }
         .btn-primary { background:var(--primary); color:white; }
         .btn-danger { background:var(--danger); color:white; }
@@ -46,7 +47,7 @@
             padding:4px 8px; border:1.5px solid var(--gray); border-radius:5px; font-size:0.8rem; 
             background:var(--white); height:30px; text-transform:uppercase; 
         }
-        .campo-group .valor { background:#F0F4F8; display:flex; align-items:center; text-transform:none; }
+        .campo-group .valor { background:#F0F4F8; display:flex; align-items:center; text-transform:uppercase; }
         .campo-group.check-group { display:flex; flex-direction:column; gap:4px; }
         .campo-group.check-group label { display:flex; align-items:center; gap:4px; font-size:0.7rem; text-transform:none; }
         .campo-group input:read-only { background:#F0F4F8; color:var(--text-dark); border-color:#D5DBDB; }
@@ -69,6 +70,7 @@
         }
         .table-input:focus { outline:none; border-color:var(--accent); }
         .table-input:disabled { background:#F0F4F8; border-color:#D5DBDB; }
+        .table-input:read-only { background:#F0F4F8; border-color:#D5DBDB; cursor:default; }
         .table-input.valido { border-left:4px solid var(--success); border-color:var(--success); background:rgba(39,174,96,0.05); }
         .table-input.error { border-left:4px solid var(--danger); border-color:var(--danger); background:rgba(231,76,60,0.05); }
         .badge { padding:2px 6px; border-radius:50px; font-weight:600; font-size:0.6rem; display:inline-block; text-transform:uppercase; }
@@ -122,7 +124,7 @@
                     <!-- Col 6: VIAJE -->
                     <div class="campo-group"><label>VIAJE</label><input type="text" id="noViaje" placeholder="VIAJE" oninput="this.value=this.value.toUpperCase()"></div>
                 </div>
-                <!-- Campo COMENTARIOS ocupa las 7 columnas (ancho completo) -->
+                <!-- Campo COMENTARIOS ocupa ancho completo -->
                 <div class="fila-comentario">
                     <div class="campo-group"><label>COMENTARIOS</label><input type="text" id="comentariosValidacion" placeholder="OBSERVACIONES DE VALIDACIÓN" oninput="this.value=this.value.toUpperCase()"></div>
                 </div>
@@ -272,15 +274,17 @@
             const tbody = document.getElementById('tablaBody');
             tbody.innerHTML = '';
             for (let i = 0; i < 5; i++) {
-                agregarFilaTienda();
+                agregarFilaTienda(true); // true = es nueva fila (editable)
             }
         }
 
-        function agregarFilaTienda() {
+        function agregarFilaTienda(esNueva = true) {
             const tbody = document.getElementById('tablaBody');
             const fila = document.createElement('tr');
+            const modoLectura = !esNueva && !esNuevoRegistro && registroActual; // Si es existente y no es nuevo, las originales son readonly
+            
             fila.innerHTML = `
-                <td><input type="text" class="table-input" placeholder="CECO" onblur="validarTienda(this)" oninput="this.value=this.value.toUpperCase()"></td>
+                <td><input type="text" class="table-input" placeholder="CECO" onblur="validarTienda(this)" oninput="this.value=this.value.toUpperCase()" ${modoLectura ? 'readonly' : ''}></td>
                 <td><span class="texto-tabla"></span></td>
                 <td><span class="badge"></span></td>
                 <td><input type="text" class="table-input" placeholder="REMISIÓN" oninput="this.value=this.value.toUpperCase()"></td>
@@ -293,13 +297,13 @@
         }
 
         function agregarFilasTiendas() {
+            if (!esModoEdicion) return; // No agregar si está validado
             for (let i = 0; i < 5; i++) {
-                agregarFilaTienda();
+                agregarFilaTienda(true); // Las nuevas siempre son editables
             }
         }
 
         function limpiarTodoDespuesGuardar() {
-            // Limpiar campos de búsqueda y validación
             document.getElementById('buscarBitacora').value = '';
             document.getElementById('transporte').value = '';
             document.getElementById('firmada').checked = true;
@@ -309,16 +313,15 @@
             document.getElementById('noViaje').value = '';
             document.getElementById('comentariosValidacion').value = '';
             
-            // Ocultar datos de bitácora
             document.getElementById('datosBitacora').style.display = 'none';
             document.getElementById('validadoMessage').style.display = 'none';
             
-            // Reiniciar tabla vacía
             inicializarTablaVacia();
             
             esNuevoRegistro = false;
             registroActual = null;
             documentoIdActual = null;
+            document.getElementById('btnAgregarTiendas').disabled = false;
         }
 
         async function buscarRegistro() {
@@ -337,19 +340,21 @@
 
                 if (snapshot.empty) {
                     ocultarLoader();
+                    // NUEVO REGISTRO - TODOS LOS CAMPOS HABILITADOS
                     esNuevoRegistro = true;
                     esModoEdicion = true;
                     document.getElementById('validadoMessage').style.display = 'none';
                     document.getElementById('btnValidar').disabled = false;
-                    document.getElementById('btnAgregarTiendas').style.display = 'inline-block';
+                    document.getElementById('btnAgregarTiendas').disabled = false;
                     
+                    // Limpiar y habilitar campos de datos generales
                     document.getElementById('verNoEmpleado').textContent = '';
                     document.getElementById('verRuta').textContent = '';
                     document.getElementById('verBitacora').textContent = bitacora;
                     document.getElementById('verUnidad').textContent = '';
-                    
                     document.getElementById('datosBitacora').style.display = 'block';
                     
+                    // Tabla con filas editables
                     inicializarTablaVacia();
                     
                     mostrarError('📝 NO EXISTE. PUEDES CREAR UN NUEVO REGISTRO.');
@@ -358,6 +363,7 @@
                     return;
                 }
 
+                // REGISTRO EXISTENTE
                 snapshot.forEach(doc => {
                     registroActual = doc.data();
                     documentoIdActual = doc.id;
@@ -373,18 +379,18 @@
                     esModoEdicion = false;
                     document.getElementById('validadoMessage').style.display = 'block';
                     document.getElementById('btnValidar').disabled = true;
-                    document.getElementById('btnAgregarTiendas').style.display = 'none';
+                    document.getElementById('btnAgregarTiendas').disabled = true;
                     bloquearCampos(true);
                     cargarDatosValidacion(registroActual);
                 } else {
                     esModoEdicion = true;
                     document.getElementById('validadoMessage').style.display = 'none';
                     document.getElementById('btnValidar').disabled = false;
-                    document.getElementById('btnAgregarTiendas').style.display = 'inline-block';
+                    document.getElementById('btnAgregarTiendas').disabled = false;
                     bloquearCampos(false);
                 }
 
-                mostrarRegistro(registroActual);
+                mostrarRegistroExistente(registroActual);
                 ocultarError();
 
             } catch (e) { 
@@ -394,7 +400,7 @@
             }
         }
 
-        function mostrarRegistro(r) {
+        function mostrarRegistroExistente(r) {
             const tbody = document.getElementById('tablaBody');
             tbody.innerHTML = '';
 
@@ -405,12 +411,13 @@
                     const rem = (r.validacion?.tiendas?.[i]?.remision || '').toUpperCase();
                     const com = (r.validacion?.tiendas?.[i]?.complemento || '').toUpperCase();
                     const fila = document.createElement('tr');
+                    // Las tiendas existentes tienen CECO readonly (no se pueden modificar)
                     fila.innerHTML = `
-                        <td><input type="text" class="table-input" value="${(t.tienda||'').toUpperCase()}" placeholder="CECO" onblur="validarTienda(this)" ${!esModoEdicion?'disabled':''} oninput="this.value=this.value.toUpperCase()"></td>
+                        <td><input type="text" class="table-input" value="${(t.tienda||'').toUpperCase()}" placeholder="CECO" readonly onblur="validarTienda(this)" oninput="this.value=this.value.toUpperCase()"></td>
                         <td><span class="texto-tabla">${d.nombre}</span></td>
                         <td><span class="badge ${badge}">${d.marca}</span></td>
-                        <td><input type="text" class="table-input" value="${rem}" placeholder="REMISIÓN" ${!esModoEdicion?'disabled':''} oninput="this.value=this.value.toUpperCase()"></td>
-                        <td><input type="text" class="table-input" value="${com}" placeholder="COMPLEMENTO" ${!esModoEdicion?'disabled':''} oninput="this.value=this.value.toUpperCase()"></td>
+                        <td><input type="text" class="table-input" value="${rem}" placeholder="REMISIÓN" ${!esModoEdicion ? 'disabled' : ''} oninput="this.value=this.value.toUpperCase()"></td>
+                        <td><input type="text" class="table-input" value="${com}" placeholder="COMPLEMENTO" ${!esModoEdicion ? 'disabled' : ''} oninput="this.value=this.value.toUpperCase()"></td>
                         <td>${t.cantidadBitacora||0}</td>
                         <td>${t.diferencia||0}</td>
                         <td><strong>${t.cantidadFisica||0}</strong></td>
