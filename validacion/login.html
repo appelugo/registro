@@ -48,7 +48,6 @@
             text-align: center;
         }
 
-        /* Logo más pequeño */
         .logo-container {
             margin-bottom: 15px;
         }
@@ -189,7 +188,6 @@
             padding-top: 8px;
         }
 
-        /* Modal de registro más compacto */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -224,7 +222,6 @@
 </head>
 <body>
     <div class="login-container">
-        <!-- Logo centrado y más pequeño -->
         <div class="logo-container">
             <img src="logo.png" alt="Logo" class="logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
             <div style="display:none; color: var(--secondary); font-size:0.8rem; padding:5px;">[SISTEMA]</div>
@@ -233,7 +230,6 @@
         <h1>Acceso al <span>Sistema</span></h1>
         <div class="subtitulo">Ventanilla de Validación</div>
 
-        <!-- Formulario de Login -->
         <div class="form-group">
             <label>👤 NÚMERO DE EMPLEADO</label>
             <input type="text" id="empleado" placeholder="Ej: 8800" autocomplete="off">
@@ -247,7 +243,6 @@
         <button class="btn" onclick="iniciarSesion()">INGRESAR</button>
         <button class="btn btn-registro" onclick="mostrarRegistro()">REGISTRAR NUEVO USUARIO</button>
 
-        <!-- Mensajes de estado -->
         <div id="mensaje" class="mensaje-error" style="display: none;"></div>
         <div id="loader" class="loader"></div>
 
@@ -256,7 +251,6 @@
         </div>
     </div>
 
-    <!-- Modal de Registro compacto -->
     <div id="modalRegistro" class="modal-overlay">
         <div class="modal-contenido">
             <h2>📝 Registro</h2>
@@ -284,9 +278,6 @@
     </div>
 
     <script>
-        // ============================================
-        // 🔥 CONFIGURACIÓN DE FIREBASE
-        // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyDD0lCq8rAnCm2KjsqSwzxlpUhQU2gRVfk",
             authDomain: "registro-charolas.firebaseapp.com",
@@ -296,22 +287,15 @@
             appId: "1:105080206085:web:443ba22aaf8cbcea767d6c"
         };
 
-        // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // ============================================
-        // FUNCIONES DE INTERFAZ
-        // ============================================
         function mostrarMensaje(texto, esError = true) {
             const mensajeDiv = document.getElementById('mensaje');
             mensajeDiv.textContent = texto;
             mensajeDiv.className = esError ? 'mensaje-error' : 'mensaje-exito';
             mensajeDiv.style.display = 'block';
-            
-            setTimeout(() => {
-                mensajeDiv.style.display = 'none';
-            }, 4000);
+            setTimeout(() => mensajeDiv.style.display = 'none', 4000);
         }
 
         function mostrarLoader(mostrar = true) {
@@ -330,9 +314,6 @@
             document.getElementById('regMensaje').innerHTML = '';
         }
 
-        // ============================================
-        // INICIAR SESIÓN
-        // ============================================
         async function iniciarSesion() {
             const empleado = document.getElementById('empleado').value.trim();
             const password = document.getElementById('password').value.trim();
@@ -361,6 +342,9 @@
                     const data = doc.data();
                     if (data.password === password) {
                         usuarioValido = true;
+                        // Guardar el nombre en sessionStorage para ventanilla
+                        sessionStorage.setItem('usuarioNombre', data.nombre || empleado);
+                        sessionStorage.setItem('usuarioEmpleado', empleado);
                     }
                 });
 
@@ -368,7 +352,6 @@
 
                 if (usuarioValido) {
                     mostrarMensaje('✅ Acceso concedido', false);
-                    
                     setTimeout(() => {
                         window.location.href = 'https://appelugo.github.io/registro/validacion/ventanilla.html';
                     }, 1000);
@@ -383,63 +366,54 @@
             }
         }
 
-        // ============================================
-// REGISTRAR USUARIO (debe tener campo 'nombre')
-// ============================================
-async function registrarUsuario() {
-    const empleado = document.getElementById('regEmpleado').value.trim();
-    const password = document.getElementById('regPassword').value.trim();
-    const nombre = document.getElementById('regNombre').value.trim();
-    const mensajeDiv = document.getElementById('regMensaje');
+        async function registrarUsuario() {
+            const empleado = document.getElementById('regEmpleado').value.trim();
+            const password = document.getElementById('regPassword').value.trim();
+            const nombre = document.getElementById('regNombre').value.trim();
+            const mensajeDiv = document.getElementById('regMensaje');
 
-    if (!empleado) {
-        mensajeDiv.innerHTML = '<span style="color: #E74C3C;">❌ Empleado obligatorio</span>';
-        return;
-    }
+            if (!empleado) {
+                mensajeDiv.innerHTML = '<span style="color: #E74C3C;">❌ Empleado obligatorio</span>';
+                return;
+            }
 
-    if (!password || password.length < 4) {
-        mensajeDiv.innerHTML = '<span style="color: #E74C3C;">❌ Contraseña (mínimo 4 caracteres)</span>';
-        return;
-    }
+            if (!password || password.length < 4) {
+                mensajeDiv.innerHTML = '<span style="color: #E74C3C;">❌ Contraseña (mínimo 4 caracteres)</span>';
+                return;
+            }
 
-    mensajeDiv.innerHTML = '<span style="color: #666;">⏳ Verificando...</span>';
+            mensajeDiv.innerHTML = '<span style="color: #666;">⏳ Verificando...</span>';
 
-    try {
-        const snapshot = await db.collection('usuarios')
-            .where('empleado', '==', empleado)
-            .get();
+            try {
+                const snapshot = await db.collection('usuarios')
+                    .where('empleado', '==', empleado)
+                    .get();
 
-        if (!snapshot.empty) {
-            mensajeDiv.innerHTML = '<span style="color: #E74C3C;">❌ Empleado ya registrado</span>';
-            return;
+                if (!snapshot.empty) {
+                    mensajeDiv.innerHTML = '<span style="color: #E74C3C;">❌ Empleado ya registrado</span>';
+                    return;
+                }
+
+                await db.collection('usuarios').add({
+                    empleado: empleado,
+                    password: password,
+                    nombre: nombre || empleado,
+                    email: empleado + '@sistema.local', // Email ficticio
+                    fechaRegistro: new Date().toLocaleString()
+                });
+
+                mensajeDiv.innerHTML = '<span style="color: #27AE60;">✅ Registro exitoso</span>';
+                
+                setTimeout(cerrarRegistro, 1500);
+
+            } catch (error) {
+                mensajeDiv.innerHTML = '<span style="color: #E74C3C;">❌ Error: ' + error.message + '</span>';
+                console.error(error);
+            }
         }
 
-        // Guardar con NOMBRE
-        await db.collection('usuarios').add({
-            empleado: empleado,
-            password: password,
-            nombre: nombre || empleado,  // ← Si no hay nombre, usa el empleado
-            email: user.email,
-            fechaRegistro: new Date().toLocaleString()
-        });
-
-        mensajeDiv.innerHTML = '<span style="color: #27AE60;">✅ Registro exitoso</span>';
-        
-        setTimeout(() => {
-            cerrarRegistro();
-        }, 1500);
-
-    } catch (error) {
-        mensajeDiv.innerHTML = '<span style="color: #E74C3C;">❌ Error: ' + error.message + '</span>';
-        console.error(error);
-    }
-}
-
-        // Permitir login con Enter
         document.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                iniciarSesion();
-            }
+            if (e.key === 'Enter') iniciarSesion();
         });
     </script>
 </body>
