@@ -52,7 +52,7 @@
         }
 
         /* ============================================ */
-        /* HEADER FIJO - MÁS COMPACTO                   */
+        /* HEADER FIJO                                   */
         /* ============================================ */
         .header-fijo {
             flex-shrink: 0;
@@ -141,18 +141,22 @@
         }
 
         /* ============================================ */
-        /* FORMULARIO COMPACTO - UNA SOLA LÍNEA         */
+        /* FORMULARIO PRINCIPAL - UNA FILA              */
         /* ============================================ */
-        .form-compacto {
+        .form-principal {
             background: linear-gradient(to right, var(--light), var(--white));
             padding: 8px 12px;
             border-radius: 8px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             border: 1px solid rgba(74, 137, 197, 0.15);
+        }
+
+        .fila-campos {
             display: grid;
-            grid-template-columns: 1.2fr 0.8fr 0.8fr 0.6fr 0.8fr 0.8fr 0.8fr 0.8fr 1.2fr;
+            grid-template-columns: 1.2fr 0.9fr 0.9fr 0.7fr 0.9fr 0.9fr 0.9fr;
             gap: 6px;
             align-items: center;
+            margin-bottom: 6px;
         }
 
         .campo-group {
@@ -210,14 +214,14 @@
             margin: 0;
         }
 
-        /* Buscador más angosto y centrado */
-        .busqueda-group {
+        /* Buscador integrado en la fila */
+        .busqueda-integrada {
             display: flex;
             gap: 3px;
             align-items: flex-end;
         }
 
-        .busqueda-group .campo-group {
+        .busqueda-integrada .campo-group {
             flex: 1;
         }
 
@@ -247,6 +251,20 @@
             cursor: not-allowed;
         }
 
+        /* Fila de comentarios (ancho completo) */
+        .fila-comentario {
+            margin-top: 6px;
+        }
+
+        .fila-comentario .campo-group {
+            width: 100%;
+        }
+
+        .fila-comentario input {
+            width: 100%;
+            height: 32px;
+        }
+
         /* ============================================ */
         /* MENSAJES                                      */
         /* ============================================ */
@@ -272,7 +290,7 @@
         }
 
         /* ============================================ */
-        /* TABLA - ANCHO AUTOMÁTICO, SOLO TEXTO         */
+        /* TABLA CON CAMPOS EDITABLES                   */
         /* ============================================ */
         .tabla-section {
             margin-top: 10px;
@@ -295,7 +313,7 @@
             width: 100%;
             border-collapse: collapse;
             table-layout: auto;
-            min-width: 1000px;
+            min-width: 1200px;
         }
 
         th {
@@ -315,11 +333,26 @@
             font-size: 0.75rem;
         }
 
-        .texto-tabla {
-            padding: 4px 4px;
-            background-color: #F8FAFD;
-            border-radius: 3px;
+        .table-input {
+            width: 100%;
+            padding: 4px 6px;
+            border: 1.5px solid var(--gray);
+            border-radius: 4px;
             font-size: 0.75rem;
+            text-align: center;
+            background-color: var(--white);
+        }
+
+        .table-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(74, 137, 197, 0.1);
+        }
+
+        .table-input:disabled {
+            background-color: #F0F4F8;
+            color: var(--text-dark);
+            border-color: #D5DBDB;
         }
 
         .badge {
@@ -418,63 +451,66 @@
                 </div>
             </div>
 
-            <!-- FORMULARIO DE UNA SOLA LÍNEA -->
-            <div class="form-compacto">
-                <!-- Buscador angosto (col 1) -->
-                <div class="busqueda-group">
-                    <div class="campo-group">
-                        <label>🔍 BITÁCORA</label>
-                        <input type="text" id="buscarBitacora" placeholder="Número" onkeypress="if(event.key==='Enter'){buscarRegistro();}">
+            <!-- FORMULARIO PRINCIPAL - UNA FILA DE CAMPOS -->
+            <div class="form-principal">
+                <!-- Primera fila: 7 columnas (buscador + 6 campos) -->
+                <div class="fila-campos">
+                    <!-- Buscador integrado (col 1) -->
+                    <div class="busqueda-integrada">
+                        <div class="campo-group">
+                            <label>🔍 BITÁCORA</label>
+                            <input type="text" id="buscarBitacora" placeholder="Número" onkeypress="if(event.key==='Enter'){buscarRegistro();}">
+                        </div>
+                        <button class="btn-lupa" id="btnBuscar" onclick="buscarRegistro()">🔍</button>
                     </div>
-                    <button class="btn-lupa" id="btnBuscar" onclick="buscarRegistro()">🔍</button>
+
+                    <!-- VALIDADOR (col 2) -->
+                    <div class="campo-group">
+                        <label>VALIDADOR</label>
+                        <input type="text" id="validador" placeholder="Validador">
+                    </div>
+
+                    <!-- TRANSPORTE (col 3) -->
+                    <div class="campo-group">
+                        <label>TRANSPORTE</label>
+                        <input type="text" id="transporte" placeholder="Transporte">
+                    </div>
+
+                    <!-- CHECKBOX en columna (col 4) -->
+                    <div class="campo-group check-group">
+                        <label><input type="checkbox" id="firmada" checked> FIRMADA</label>
+                        <label><input type="checkbox" id="sellada" checked> SELLADA</label>
+                    </div>
+
+                    <!-- FECHA (col 5) -->
+                    <div class="campo-group">
+                        <label>FECHA</label>
+                        <input type="date" id="fechaBitacora">
+                    </div>
+
+                    <!-- NO. OPERADOR (col 6) -->
+                    <div class="campo-group">
+                        <label>OPERADOR</label>
+                        <input type="text" id="noOperador" placeholder="Operador">
+                    </div>
+
+                    <!-- NO. VIAJE (col 7) -->
+                    <div class="campo-group">
+                        <label>VIAJE</label>
+                        <input type="text" id="noViaje" placeholder="Viaje">
+                    </div>
                 </div>
 
-                <!-- VALIDADOR (col 2) -->
-                <div class="campo-group">
-                    <label>VALIDADOR</label>
-                    <input type="text" id="validador" placeholder="Validador">
-                </div>
-
-                <!-- TRANSPORTE (col 3) -->
-                <div class="campo-group">
-                    <label>TRANSPORTE</label>
-                    <input type="text" id="transporte" placeholder="Transporte">
-                </div>
-
-                <!-- CHECKBOX en columna (col 4) -->
-                <div class="campo-group check-group">
-                    <label><input type="checkbox" id="firmada" checked> FIRMADA</label>
-                    <label><input type="checkbox" id="sellada" checked> SELLADA</label>
-                </div>
-
-                <!-- FECHA (col 5) -->
-                <div class="campo-group">
-                    <label>FECHA</label>
-                    <input type="date" id="fechaBitacora">
-                </div>
-
-                <!-- NO. OPERADOR (col 6) -->
-                <div class="campo-group">
-                    <label>OPERADOR</label>
-                    <input type="text" id="noOperador" placeholder="Operador">
-                </div>
-
-                <!-- NO. VIAJE (col 7) -->
-                <div class="campo-group">
-                    <label>VIAJE</label>
-                    <input type="text" id="noViaje" placeholder="Viaje">
-                </div>
-
-                <!-- BOLETA (col 8) -->
-                <div class="campo-group">
-                    <label>BOLETA</label>
-                    <input type="text" id="boleta" placeholder="Boleta">
-                </div>
-
-                <!-- COMENTARIOS (col 9) -->
-                <div class="campo-group">
-                    <label>COMENTARIOS</label>
-                    <input type="text" id="comentariosValidacion" placeholder="Observaciones">
+                <!-- Segunda fila: BOLETA + COMENTARIOS (ancho completo) -->
+                <div class="fila-comentario" style="display: grid; grid-template-columns: 0.9fr 3fr; gap: 6px;">
+                    <div class="campo-group">
+                        <label>BOLETA</label>
+                        <input type="text" id="boleta" placeholder="Boleta">
+                    </div>
+                    <div class="campo-group">
+                        <label>COMENTARIOS</label>
+                        <input type="text" id="comentariosValidacion" placeholder="Observaciones de la validación">
+                    </div>
                 </div>
             </div>
         </div>
@@ -490,26 +526,28 @@
             <div id="mensajeError" class="mensaje-error" style="display: none;"></div>
 
             <!-- DATOS DE BITÁCORA (solo lectura) -->
-            <div class="form-compacto" id="datosBitacora" style="display: none; grid-template-columns: repeat(4, 1fr);">
-                <div class="campo-group">
-                    <label>NO. EMPLEADO</label>
-                    <div class="valor" id="verNoEmpleado">—</div>
-                </div>
-                <div class="campo-group">
-                    <label>RUTA</label>
-                    <div class="valor" id="verRuta">—</div>
-                </div>
-                <div class="campo-group">
-                    <label>BITÁCORA</label>
-                    <div class="valor" id="verBitacora">—</div>
-                </div>
-                <div class="campo-group">
-                    <label>UNIDAD</label>
-                    <div class="valor" id="verUnidad">—</div>
+            <div class="form-principal" id="datosBitacora" style="display: none;">
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+                    <div class="campo-group">
+                        <label>NO. EMPLEADO</label>
+                        <div class="valor" id="verNoEmpleado">—</div>
+                    </div>
+                    <div class="campo-group">
+                        <label>RUTA</label>
+                        <div class="valor" id="verRuta">—</div>
+                    </div>
+                    <div class="campo-group">
+                        <label>BITÁCORA</label>
+                        <div class="valor" id="verBitacora">—</div>
+                    </div>
+                    <div class="campo-group">
+                        <label>UNIDAD</label>
+                        <div class="valor" id="verUnidad">—</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- TABLA DE TIENDAS (SOLO TEXTO) -->
+            <!-- TABLA DE TIENDAS CON REMISIÓN Y COMPLEMENTO EDITABLES -->
             <div id="tablaSection" style="display: none;" class="tabla-section">
                 <h3>📋 VALIDACIÓN DE TIENDAS</h3>
                 <div class="table-responsive">
@@ -569,15 +607,12 @@
         let esModoEdicion = true;   // Si está validado, se bloquea
 
         // ============================================
-        // VERIFICAR AUTENTICACIÓN (con número de empleado)
+        // VERIFICAR AUTENTICACIÓN
         // ============================================
         auth.onAuthStateChanged(async (user) => {
             if (user) {
-                // Buscar el empleado asociado al email (deberías tener una relación)
-                // Por ahora usamos el email, pero idealmente sería el número de empleado
                 document.getElementById('userInfo').style.display = 'flex';
                 
-                // Intentar obtener el número de empleado desde Firestore
                 try {
                     const snapshot = await db.collection('usuarios')
                         .where('email', '==', user.email)
@@ -671,19 +706,16 @@
                     documentoIdActual = doc.id;
                 });
 
-                // Verificar si ya está validado
                 if (registroActual.validacion) {
                     esModoEdicion = false;
                     document.getElementById('validadoMessage').style.display = 'block';
                     document.getElementById('btnValidar').disabled = true;
-                    document.getElementById('btnBuscar').disabled = false;
                     bloquearCampos(true);
                     cargarDatosValidacion(registroActual);
                 } else {
                     esModoEdicion = true;
                     document.getElementById('validadoMessage').style.display = 'none';
                     document.getElementById('btnValidar').disabled = false;
-                    document.getElementById('btnBuscar').disabled = false;
                     bloquearCampos(false);
                 }
 
@@ -716,7 +748,7 @@
         }
 
         // ============================================
-        // MOSTRAR REGISTRO (CON NOMBRE Y MARCA AUTOMÁTICOS)
+        // MOSTRAR REGISTRO
         // ============================================
         function mostrarRegistro(registro) {
             document.getElementById('verNoEmpleado').textContent = registro.datosGenerales?.noEmpleado || 'S/N';
@@ -724,7 +756,7 @@
             document.getElementById('verBitacora').textContent = registro.datosGenerales?.bitacora || 'S/N';
             document.getElementById('verUnidad').textContent = registro.datosGenerales?.unidad || 'S/N';
             
-            document.getElementById('datosBitacora').style.display = 'grid';
+            document.getElementById('datosBitacora').style.display = 'block';
             document.getElementById('tablaSection').style.display = 'block';
 
             const tbody = document.getElementById('tablaBody');
@@ -736,16 +768,16 @@
                     
                     const fila = document.createElement('tr');
                     
-                    // Determinar si hay datos de validación previos
-                    const remision = (registro.validacion?.tiendas && registro.validacion.tiendas[index]?.remision) || '';
-                    const complemento = (registro.validacion?.tiendas && registro.validacion.tiendas[index]?.complemento) || '';
+                    // Valores previos de remisión y complemento si existen
+                    const remisionPrev = (registro.validacion?.tiendas && registro.validacion.tiendas[index]?.remision) || '';
+                    const complementoPrev = (registro.validacion?.tiendas && registro.validacion.tiendas[index]?.complemento) || '';
                     
                     fila.innerHTML = `
                         <td>${tienda.tienda || ''}</td>
-                        <td><span class="texto-tabla">${datos.nombre || ''}</span></td>
                         <td><span class="badge ${datos.marca === 'DOMINOS' ? 'badge-dominos' : 'badge-starbucks'}">${datos.marca || ''}</span></td>
-                        <td><span class="texto-tabla">${remision}</span></td>
-                        <td><span class="texto-tabla">${complemento}</span></td>
+                        <td><span class="texto-tabla">${datos.nombre || ''}</span></td>
+                        <td><input type="text" class="table-input" value="${remisionPrev}" placeholder="Remisión" id="remision_${index}" ${!esModoEdicion ? 'disabled' : ''}></td>
+                        <td><input type="text" class="table-input" value="${complementoPrev}" placeholder="Complemento" id="complemento_${index}" ${!esModoEdicion ? 'disabled' : ''}></td>
                         <td>${tienda.cantidadBitacora || 0}</td>
                         <td>${tienda.diferencia || 0}</td>
                         <td><strong>${tienda.cantidadFisica || 0}</strong></td>
@@ -754,7 +786,6 @@
                 });
             }
 
-            // Cargar datos de validación si existen
             if (registro.validacion) {
                 document.getElementById('validador').value = registro.validacion.validador || '';
                 document.getElementById('transporte').value = registro.validacion.transporte || '';
@@ -790,6 +821,16 @@
             mostrarLoader('Guardando validación...');
 
             try {
+                // Recolectar remisiones y complementos de la tabla
+                const tiendasValidacion = [];
+                const filas = document.querySelectorAll('#tablaBody tr');
+                
+                filas.forEach((fila, index) => {
+                    const remision = document.getElementById(`remision_${index}`)?.value || '';
+                    const complemento = document.getElementById(`complemento_${index}`)?.value || '';
+                    tiendasValidacion.push({ remision, complemento });
+                });
+
                 const validacionData = {
                     validador: document.getElementById('validador').value.trim() || 'Validador',
                     transporte: document.getElementById('transporte').value.trim() || '',
@@ -800,6 +841,7 @@
                     noViaje: document.getElementById('noViaje').value.trim() || '',
                     boleta: document.getElementById('boleta').value.trim() || '',
                     comentarios: document.getElementById('comentariosValidacion').value.trim() || '',
+                    tiendas: tiendasValidacion,
                     fechaValidacion: new Date().toLocaleString(),
                     validadoPor: auth.currentUser.email
                 };
@@ -811,7 +853,6 @@
                 ocultarLoader();
                 alert('✅ Validación guardada correctamente');
                 
-                // Bloquear edición
                 esModoEdicion = false;
                 document.getElementById('validadoMessage').style.display = 'block';
                 document.getElementById('btnValidar').disabled = true;
