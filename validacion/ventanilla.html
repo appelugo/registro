@@ -46,18 +46,27 @@
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 30px);
         }
 
         /* ============================================ */
-        /* HEADER COMPACTO                              */
+        /* HEADER FIJO                                   */
         /* ============================================ */
-        .header {
+        .header-fijo {
+            flex-shrink: 0;
+            background-color: var(--white);
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent);
+            margin-bottom: 15px;
+        }
+
+        .header-superior {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--accent);
+            margin-bottom: 10px;
         }
 
         .header-left {
@@ -71,16 +80,22 @@
             width: auto;
         }
 
-        .header h1 {
+        .header-left h1 {
             color: var(--primary);
             font-weight: 600;
             font-size: 1.4rem;
             margin: 0;
         }
 
-        .header h1 span {
+        .header-left h1 span {
             color: var(--accent);
             font-weight: 300;
+        }
+
+        .header-derecha {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
         .user-info {
@@ -99,8 +114,36 @@
             font-size: 0.85rem;
         }
 
+        .btn-validar-header {
+            background-color: var(--warning);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 25px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(243, 156, 18, 0.3);
+        }
+
+        .btn-validar-header:hover {
+            background-color: #E67E22;
+            transform: translateY(-1px);
+        }
+
         /* ============================================ */
-        /* BOTONES                                      */
+        /* SECCIÓN DESPLAZABLE (SCROLL)                 */
+        /* ============================================ */
+        .scrollable {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        /* ============================================ */
+        /* BOTONES                                       */
         /* ============================================ */
         .btn {
             padding: 6px 14px;
@@ -128,15 +171,6 @@
             background-color: #0D2B4A;
         }
 
-        .btn-success {
-            background-color: var(--success);
-            color: white;
-        }
-
-        .btn-success:hover {
-            background-color: #219A53;
-        }
-
         .btn-danger {
             background-color: var(--danger);
             color: white;
@@ -146,17 +180,8 @@
             background-color: #C0392B;
         }
 
-        .btn-warning {
-            background-color: var(--warning);
-            color: white;
-        }
-
-        .btn-warning:hover {
-            background-color: #E67E22;
-        }
-
         /* ============================================ */
-        /* FORMULARIO COMPACTO - 6 COLUMNAS             */
+        /* FORMULARIO COMPACTO                           */
         /* ============================================ */
         .form-compacto {
             background: linear-gradient(to right, var(--light), var(--white));
@@ -185,6 +210,7 @@
         }
 
         .campo-group input, 
+        .campo-group select,
         .campo-group .valor {
             padding: 6px 10px;
             border: 1.5px solid var(--gray);
@@ -201,11 +227,36 @@
             align-items: center;
         }
 
-        /* Grupo de búsqueda especial */
+        .campo-group.check-group {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 15px;
+            height: 34px;
+        }
+
+        .campo-group.check-group label {
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.75rem;
+            text-transform: none;
+            font-weight: 500;
+        }
+
+        .campo-group.check-group input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            margin: 0;
+        }
+
+        /* Búsqueda especial */
         .busqueda-group {
             display: flex;
             gap: 5px;
             align-items: flex-end;
+            grid-column: span 2;
         }
 
         .busqueda-group .campo-group {
@@ -234,41 +285,7 @@
         }
 
         /* ============================================ */
-        /* CAMPO DE COMENTARIOS - ANCHO COMPLETO        */
-        /* ============================================ */
-        .comentario-full {
-            grid-column: 1 / -1;
-            margin-top: 5px;
-        }
-
-        .comentario-full label {
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 2px;
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            display: block;
-        }
-
-        .comentario-full input {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1.5px solid var(--gray);
-            border-radius: 6px;
-            font-size: 0.85rem;
-            background-color: var(--white);
-            height: 38px;
-        }
-
-        .comentario-full input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(74, 137, 197, 0.1);
-        }
-
-        /* ============================================ */
-        /* TABLA                                        */
+        /* TABLA MEJORADA                                */
         /* ============================================ */
         .tabla-section {
             margin-top: 15px;
@@ -290,7 +307,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 700px;
+            min-width: 1200px;
         }
 
         th {
@@ -308,6 +325,15 @@
             border-bottom: 1px solid var(--gray);
             text-align: center;
             font-size: 0.8rem;
+        }
+
+        .table-input {
+            width: 100%;
+            padding: 4px 6px;
+            border: 1.5px solid var(--gray);
+            border-radius: 4px;
+            font-size: 0.8rem;
+            text-align: center;
         }
 
         .badge {
@@ -331,9 +357,16 @@
             border: 1px solid #006241;
         }
 
-        /* ============================================ */
-        /* MENSAJES                                      */
-        /* ============================================ */
+        .validado-message {
+            background-color: rgba(39, 174, 96, 0.1);
+            color: var(--success);
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 4px solid var(--success);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
         .mensaje-error {
             color: var(--danger);
             font-size: 0.8rem;
@@ -344,9 +377,6 @@
             border-left: 4px solid var(--danger);
         }
 
-        /* ============================================ */
-        /* LOADER                                       */
-        /* ============================================ */
         .loader-overlay {
             position: fixed;
             top: 0;
@@ -394,95 +424,135 @@
             text-align: right;
             border-top: 1px solid var(--gray);
             padding-top: 10px;
+            flex-shrink: 0;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- HEADER CON LOGO -->
-        <div class="header">
-            <div class="header-left">
-                <img src="logo.png" alt="Logo" class="logo-small" onerror="this.style.display='none'">
-                <h1>Ventanilla de <span>Validación</span></h1>
-            </div>
-            <div class="user-info" id="userInfo" style="display: none;">
-                <span class="user-email" id="userEmail"></span>
-                <button class="btn btn-danger" onclick="cerrarSesion()">SALIR</button>
-            </div>
-            <div id="loginButtons" style="display: flex; gap: 8px;">
-                <button class="btn btn-primary" onclick="window.location.href='login.html'">ACCEDER</button>
-            </div>
-        </div>
-
-        <!-- FORMULARIO COMPACTO DE 6 COLUMNAS -->
-        <div class="form-compacto" id="formularioBusqueda">
-            <!-- Col 1: Búsqueda (2 columnas: input + lupa) -->
-            <div class="busqueda-group" style="grid-column: span 2;">
-                <div class="campo-group">
-                    <label>🔍 BITÁCORA</label>
-                    <input type="text" id="buscarBitacora" placeholder="Número de bitácora" onkeypress="if(event.key==='Enter'){buscarRegistro();}">
+        <!-- HEADER FIJO CON BOTÓN VALIDAR -->
+        <div class="header-fijo">
+            <div class="header-superior">
+                <div class="header-left">
+                    <img src="logo.png" alt="Logo" class="logo-small" onerror="this.style.display='none'">
+                    <h1>Ventanilla de <span>Validación</span></h1>
                 </div>
-                <button class="btn-lupa" onclick="buscarRegistro()">🔍</button>
+                <div class="header-derecha">
+                    <div class="user-info" id="userInfo" style="display: none;">
+                        <span class="user-email" id="userEmail"></span>
+                        <button class="btn btn-danger" onclick="cerrarSesion()">SALIR</button>
+                    </div>
+                    <div id="loginButtons" style="display: flex; gap: 8px;">
+                        <button class="btn btn-primary" onclick="window.location.href='login.html'">ACCEDER</button>
+                    </div>
+                    <!-- BOTÓN VALIDAR EN EL HEADER -->
+                    <button class="btn-validar-header" onclick="guardarValidacion()">✅ VALIDAR</button>
+                </div>
             </div>
 
-            <!-- Col 2: No. Empleado -->
-            <div class="campo-group">
-                <label>NO. EMPLEADO</label>
-                <div class="valor" id="verNoEmpleado">—</div>
-            </div>
+            <!-- FORMULARIO DE BÚSQUEDA Y DATOS GENERALES -->
+            <div class="form-compacto">
+                <!-- Búsqueda (2 columnas) -->
+                <div class="busqueda-group">
+                    <div class="campo-group">
+                        <label>🔍 BITÁCORA</label>
+                        <input type="text" id="buscarBitacora" placeholder="Número de bitácora" onkeypress="if(event.key==='Enter'){buscarRegistro();}">
+                    </div>
+                    <button class="btn-lupa" onclick="buscarRegistro()">🔍</button>
+                </div>
 
-            <!-- Col 3: Ruta -->
-            <div class="campo-group">
-                <label>RUTA</label>
-                <div class="valor" id="verRuta">—</div>
-            </div>
+                <!-- Campos generales (4 columnas) -->
+                <div class="campo-group">
+                    <label>VALIDADOR</label>
+                    <input type="text" id="validador" placeholder="Nombre del validador">
+                </div>
 
-            <!-- Col 4: Bitácora -->
-            <div class="campo-group">
-                <label>BITÁCORA</label>
-                <div class="valor" id="verBitacora">—</div>
-            </div>
+                <div class="campo-group">
+                    <label>TRANSPORTE</label>
+                    <input type="text" id="transporte" placeholder="Transporte">
+                </div>
 
-            <!-- Col 5: Unidad -->
-            <div class="campo-group">
-                <label>UNIDAD</label>
-                <div class="valor" id="verUnidad">—</div>
-            </div>
+                <div class="campo-group check-group">
+                    <label><input type="checkbox" id="firmada" checked> FIRMADA</label>
+                    <label><input type="checkbox" id="sellada" checked> SELLADA</label>
+                </div>
 
-            <!-- Fila completa para comentarios (debajo de las 6 columnas) -->
-            <div class="comentario-full">
-                <label>✏️ COMENTARIOS</label>
-                <input type="text" id="editarComentarios" placeholder="Agrega un comentario si hay error...">
+                <div class="campo-group">
+                    <label>FECHA BITÁCORA</label>
+                    <input type="date" id="fechaBitacora">
+                </div>
+
+                <div class="campo-group">
+                    <label>NO. OPERADOR</label>
+                    <input type="text" id="noOperador" placeholder="Operador">
+                </div>
+
+                <div class="campo-group">
+                    <label>NO. VIAJE</label>
+                    <input type="text" id="noViaje" placeholder="Viaje">
+                </div>
+
+                <div class="campo-group">
+                    <label>BOLETA</label>
+                    <input type="text" id="boleta" placeholder="Boleta">
+                </div>
             </div>
         </div>
 
-        <!-- BOTÓN VALIDAR (antes "Guardar comentario") -->
-        <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
-            <button class="btn btn-warning" onclick="guardarComentario()" style="padding: 8px 25px;">✅ VALIDAR</button>
-        </div>
+        <!-- SECCIÓN DESPLAZABLE (SOLO ESTO HACE SCROLL) -->
+        <div class="scrollable">
+            <!-- MENSAJE DE VALIDADO -->
+            <div id="validadoMessage" class="validado-message" style="display: none;">
+                ✅ Esta bitácora ya fue validada
+            </div>
 
-        <!-- MENSAJE DE ERROR -->
-        <div id="mensajeError" class="mensaje-error" style="display: none;"></div>
+            <!-- MENSAJE DE ERROR -->
+            <div id="mensajeError" class="mensaje-error" style="display: none;"></div>
 
-        <!-- TABLA DE TIENDAS -->
-        <div id="tablaSection" style="display: none;" class="tabla-section">
-            <h3>📋 TIENDAS CAPTURADAS</h3>
-            <div class="table-responsive">
-                <table id="tablaTiendas">
-                    <thead>
-                        <tr>
-                            <th>TIENDA</th>
-                            <th>CANTIDAD</th>
-                            <th>DIFERENCIA</th>
-                            <th>CNT. FÍSICA</th>
-                            <th>TIPO</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tablaBody"></tbody>
-                </table>
+            <!-- DATOS DE BITÁCORA (solo lectura) -->
+            <div class="form-compacto" id="datosBitacora" style="display: none;">
+                <div class="campo-group">
+                    <label>NO. EMPLEADO</label>
+                    <div class="valor" id="verNoEmpleado">—</div>
+                </div>
+                <div class="campo-group">
+                    <label>RUTA</label>
+                    <div class="valor" id="verRuta">—</div>
+                </div>
+                <div class="campo-group">
+                    <label>BITÁCORA</label>
+                    <div class="valor" id="verBitacora">—</div>
+                </div>
+                <div class="campo-group">
+                    <label>UNIDAD</label>
+                    <div class="valor" id="verUnidad">—</div>
+                </div>
+            </div>
+
+            <!-- TABLA DE TIENDAS CON CAMPOS DE VALIDACIÓN -->
+            <div id="tablaSection" style="display: none;" class="tabla-section">
+                <h3>📋 VALIDACIÓN DE TIENDAS</h3>
+                <div class="table-responsive">
+                    <table id="tablaTiendas">
+                        <thead>
+                            <tr>
+                                <th>TIENDA</th>
+                                <th>NOMBRE TIENDA</th>
+                                <th>MARCA</th>
+                                <th>REMISIÓN</th>
+                                <th>COMPLEMENTO</th>
+                                <th>CANTIDAD</th>
+                                <th>DIFERENCIA</th>
+                                <th>CNT. FÍSICA</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
+        <!-- FOOTER FIJO -->
         <div class="footer">
             Sistema de Validación de Registro de charolas V2.0 | E.Lugo 2026
         </div>
@@ -515,6 +585,7 @@
 
         let registroActual = null;
         let documentoIdActual = null;
+        let listaCECOs = []; // Para cargar nombres de tiendas y marcas
 
         // ============================================
         // VERIFICAR AUTENTICACIÓN
@@ -524,11 +595,11 @@
                 document.getElementById('userInfo').style.display = 'flex';
                 document.getElementById('userEmail').textContent = user.email;
                 document.getElementById('loginButtons').style.display = 'none';
+                cargarOrganigrama(); // Cargar datos de tiendas
             } else {
                 document.getElementById('userInfo').style.display = 'none';
                 document.getElementById('loginButtons').style.display = 'flex';
-                document.getElementById('tablaSection').style.display = 'none';
-                limpiarCampos();
+                limpiarTodo();
             }
         });
 
@@ -538,12 +609,19 @@
             });
         }
 
-        function limpiarCampos() {
-            document.getElementById('verNoEmpleado').textContent = '—';
-            document.getElementById('verRuta').textContent = '—';
-            document.getElementById('verBitacora').textContent = '—';
-            document.getElementById('verUnidad').textContent = '—';
-            document.getElementById('editarComentarios').value = '';
+        // ============================================
+        // CARGAR ORGANIGRAMA (nombre tienda y marca)
+        // ============================================
+        async function cargarOrganigrama() {
+            try {
+                const snapshot = await db.collection('organigrama').doc('lista_cecos').get();
+                if (snapshot.exists) {
+                    listaCECOs = snapshot.data().cecos || [];
+                    console.log(`✅ Organigrama cargado: ${listaCECOs.length} tiendas`);
+                }
+            } catch (error) {
+                console.error('Error cargando organigrama:', error);
+            }
         }
 
         // ============================================
@@ -567,8 +645,7 @@
                 if (snapshot.empty) {
                     ocultarLoader();
                     mostrarError('❌ No se encontró ningún registro');
-                    document.getElementById('tablaSection').style.display = 'none';
-                    limpiarCampos();
+                    ocultarTodo();
                     registroActual = null;
                     documentoIdActual = null;
                     return;
@@ -578,6 +655,14 @@
                     registroActual = doc.data();
                     documentoIdActual = doc.id;
                 });
+
+                // Verificar si ya fue validado
+                if (registroActual.validacion) {
+                    document.getElementById('validadoMessage').style.display = 'block';
+                    cargarDatosValidacion(registroActual);
+                } else {
+                    document.getElementById('validadoMessage').style.display = 'none';
+                }
 
                 mostrarRegistro(registroActual);
                 ocultarError();
@@ -589,70 +674,146 @@
             }
         }
 
+        // ============================================
+        // MOSTRAR REGISTRO
+        // ============================================
         function mostrarRegistro(registro) {
+            // Datos de bitácora (solo lectura)
             document.getElementById('verNoEmpleado').textContent = registro.datosGenerales?.noEmpleado || 'S/N';
             document.getElementById('verRuta').textContent = registro.datosGenerales?.ruta || 'S/N';
             document.getElementById('verBitacora').textContent = registro.datosGenerales?.bitacora || 'S/N';
             document.getElementById('verUnidad').textContent = registro.datosGenerales?.unidad || 'S/N';
-            document.getElementById('editarComentarios').value = registro.datosGenerales?.comentarios || '';
-
+            
+            document.getElementById('datosBitacora').style.display = 'grid';
             document.getElementById('tablaSection').style.display = 'block';
 
+            // Generar tabla con campos de validación
             const tbody = document.getElementById('tablaBody');
             tbody.innerHTML = '';
 
             if (registro.registros && registro.registros.length > 0) {
-                registro.registros.forEach(tienda => {
+                registro.registros.forEach((tienda, index) => {
+                    // Buscar datos de organigrama (simulado - aquí deberías buscar en tu array)
+                    const nombreTienda = tienda.tienda || '';
+                    const marca = tienda.tipo || '';
+
                     const fila = document.createElement('tr');
                     fila.innerHTML = `
                         <td>${tienda.tienda || ''}</td>
+                        <td><input type="text" class="table-input" value="${nombreTienda}" placeholder="Nombre tienda" id="nombreTienda_${index}"></td>
+                        <td><input type="text" class="table-input" value="${marca}" placeholder="Marca" id="marca_${index}"></td>
+                        <td><input type="text" class="table-input" placeholder="Remisión" id="remision_${index}"></td>
+                        <td><input type="text" class="table-input" placeholder="Complemento" id="complemento_${index}"></td>
                         <td>${tienda.cantidadBitacora || 0}</td>
                         <td>${tienda.diferencia || 0}</td>
                         <td><strong>${tienda.cantidadFisica || 0}</strong></td>
-                        <td><span class="badge ${tienda.tipo === 'DOMINO\'S' ? 'badge-dominos' : 'badge-starbucks'}">${tienda.tipo || ''}</span></td>
                     `;
                     tbody.appendChild(fila);
                 });
-            } else {
-                tbody.innerHTML = '<tr><td colspan="5">Sin tiendas</td></tr>';
+            }
+
+            // Si ya hay datos de validación guardados, cargarlos
+            if (registro.validacion) {
+                document.getElementById('validador').value = registro.validacion.validador || '';
+                document.getElementById('transporte').value = registro.validacion.transporte || '';
+                document.getElementById('firmada').checked = registro.validacion.firmada || false;
+                document.getElementById('sellada').checked = registro.validacion.sellada || false;
+                document.getElementById('fechaBitacora').value = registro.validacion.fechaBitacora || '';
+                document.getElementById('noOperador').value = registro.validacion.noOperador || '';
+                document.getElementById('noViaje').value = registro.validacion.noViaje || '';
+                document.getElementById('boleta').value = registro.validacion.boleta || '';
+
+                // Cargar remisiones y complementos
+                if (registro.validacion.tiendas) {
+                    registro.validacion.tiendas.forEach((item, index) => {
+                        if (document.getElementById(`remision_${index}`)) {
+                            document.getElementById(`remision_${index}`).value = item.remision || '';
+                            document.getElementById(`complemento_${index}`).value = item.complemento || '';
+                        }
+                    });
+                }
             }
         }
 
         // ============================================
-        // VALIDAR (GUARDAR COMENTARIO)
+        // GUARDAR VALIDACIÓN (botón del header)
         // ============================================
-        async function guardarComentario() {
+        async function guardarValidacion() {
             if (!documentoIdActual) {
-                alert('❌ No hay registro seleccionado');
+                alert('❌ Primero busca una bitácora');
                 return;
             }
 
-            const comentario = document.getElementById('editarComentarios').value.trim();
-            
-            mostrarLoader('Guardando...');
+            if (!auth.currentUser) {
+                alert('❌ Debes iniciar sesión');
+                return;
+            }
+
+            mostrarLoader('Guardando validación...');
 
             try {
+                // Recolectar datos de tiendas
+                const tiendasValidacion = [];
+                const filas = document.querySelectorAll('#tablaBody tr');
+                
+                filas.forEach((fila, index) => {
+                    const remision = document.getElementById(`remision_${index}`)?.value || '';
+                    const complemento = document.getElementById(`complemento_${index}`)?.value || '';
+                    tiendasValidacion.push({ remision, complemento });
+                });
+
+                // Crear objeto de validación
+                const validacionData = {
+                    validador: document.getElementById('validador').value.trim() || auth.currentUser.email,
+                    transporte: document.getElementById('transporte').value.trim() || '',
+                    firmada: document.getElementById('firmada').checked,
+                    sellada: document.getElementById('sellada').checked,
+                    fechaBitacora: document.getElementById('fechaBitacora').value || '',
+                    noOperador: document.getElementById('noOperador').value.trim() || '',
+                    noViaje: document.getElementById('noViaje').value.trim() || '',
+                    boleta: document.getElementById('boleta').value.trim() || '',
+                    tiendas: tiendasValidacion,
+                    fechaValidacion: new Date().toLocaleString(),
+                    validadoPor: auth.currentUser.email
+                };
+
+                // Guardar en Firestore (actualizando el documento)
                 await db.collection('registros').doc(documentoIdActual).update({
-                    'datosGenerales.comentarios': comentario || 'S/N'
+                    validacion: validacionData
                 });
 
                 ocultarLoader();
-                alert('✅ Comentario validado correctamente');
-
-                if (registroActual) {
-                    registroActual.datosGenerales.comentarios = comentario || 'S/N';
-                }
+                alert('✅ Validación guardada correctamente');
+                
+                // Mostrar mensaje de validado
+                document.getElementById('validadoMessage').style.display = 'block';
 
             } catch (error) {
                 ocultarLoader();
-                alert('❌ Error: ' + error.message);
+                alert('❌ Error al guardar: ' + error.message);
+            }
+        }
+
+        // ============================================
+        // CARGAR DATOS DE VALIDACIÓN EXISTENTE
+        // ============================================
+        function cargarDatosValidacion(registro) {
+            if (registro.validacion) {
+                document.getElementById('validador').value = registro.validacion.validador || '';
+                document.getElementById('transporte').value = registro.validacion.transporte || '';
+                document.getElementById('firmada').checked = registro.validacion.firmada || false;
+                document.getElementById('sellada').checked = registro.validacion.sellada || false;
+                document.getElementById('fechaBitacora').value = registro.validacion.fechaBitacora || '';
+                document.getElementById('noOperador').value = registro.validacion.noOperador || '';
+                document.getElementById('noViaje').value = registro.validacion.noViaje || '';
+                document.getElementById('boleta').value = registro.validacion.boleta || '';
             }
         }
 
         // ============================================
         // FUNCIONES AUXILIARES
         // ============================================
-        function mostrarLoader(mensaje = 'Buscando...') {
+        function mostrarLoader(mensaje = 'Procesando...') {
             document.querySelector('.loader-text').textContent = mensaje;
             document.getElementById('loaderOverlay').style.display = 'flex';
         }
@@ -668,6 +829,25 @@
 
         function ocultarError() {
             document.getElementById('mensajeError').style.display = 'none';
+        }
+
+        function ocultarTodo() {
+            document.getElementById('datosBitacora').style.display = 'none';
+            document.getElementById('tablaSection').style.display = 'none';
+            document.getElementById('validadoMessage').style.display = 'none';
+        }
+
+        function limpiarTodo() {
+            document.getElementById('buscarBitacora').value = '';
+            document.getElementById('validador').value = '';
+            document.getElementById('transporte').value = '';
+            document.getElementById('firmada').checked = true;
+            document.getElementById('sellada').checked = true;
+            document.getElementById('fechaBitacora').value = '';
+            document.getElementById('noOperador').value = '';
+            document.getElementById('noViaje').value = '';
+            document.getElementById('boleta').value = '';
+            ocultarTodo();
         }
     </script>
 </body>
