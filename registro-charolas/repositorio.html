@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>Registro - Retorno de Charolas</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK (Compatibilidad con versiones anteriores) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <style>
@@ -46,14 +46,14 @@
             background-color: var(--white);
             border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
-            padding: 15px;
+            padding: 15px; /* Reducido */
             display: flex;
             flex-direction: column;
             height: calc(100vh - 30px);
         }
 
         /* ============================================ */
-        /* HEADER FIJO */
+        /* HEADER FIJO - TODO LO QUE ESTÁ ARRIBA DE LA TABLA */
         /* ============================================ */
         .fixed-header {
             flex-shrink: 0;
@@ -66,8 +66,8 @@
             flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 8px;
-            padding-bottom: 8px;
+            margin-bottom: 8px; /* Reducido */
+            padding-bottom: 8px; /* Reducido */
             border-bottom: 2px solid var(--accent);
         }
 
@@ -79,14 +79,14 @@
         }
 
         .logo-small {
-            max-width: 60px;
+            max-width: 60px; /* Reducido */
             height: auto;
         }
 
         .header h1 {
             color: var(--primary);
             font-weight: 600;
-            font-size: 1.5rem;
+            font-size: 1.5rem; /* Reducido */
             margin: 0;
         }
 
@@ -97,10 +97,13 @@
 
         .btn-group {
             display: flex;
-            gap: 8px;
+            gap: 8px; /* Reducido */
             flex-wrap: wrap;
         }
 
+        /* ============================================ */
+        /* FECHA FIJA - JUSTO ARRIBA DE LA TABLA */
+        /* ============================================ */
         .fecha-fija {
             background-color: var(--white);
             padding: 3px 0 5px 0;
@@ -114,20 +117,23 @@
             z-index: 15;
         }
 
+        /* ============================================ */
+        /* ESTADÍSTICAS COMPACTAS */
+        /* ============================================ */
         .stats-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 8px;
+            gap: 8px; /* Reducido */
+            margin-bottom: 8px; /* Reducido */
         }
 
         .stat-card {
             background: linear-gradient(135deg, var(--light), var(--white));
-            padding: 6px 12px;
-            border-radius: 8px;
-            border-left: 4px solid var(--accent);
+            padding: 6px 12px; /* Reducido */
+            border-radius: 8px; /* Reducido */
+            border-left: 4px solid var(--accent); /* Reducido */
             box-shadow: var(--box-shadow);
-            flex: 1 1 160px;
+            flex: 1 1 160px; /* Reducido */
         }
 
         .stat-card.dominos {
@@ -139,7 +145,7 @@
         }
 
         .stat-label {
-            font-size: 0.65rem;
+            font-size: 0.65rem; /* Reducido */
             text-transform: uppercase;
             color: var(--secondary);
             font-weight: 600;
@@ -147,16 +153,16 @@
         }
 
         .stat-number {
-            font-size: 1.3rem;
+            font-size: 1.3rem; /* Reducido */
             font-weight: 700;
             color: var(--primary);
             line-height: 1.1;
         }
 
         .stat-sub {
-            font-size: 0.65rem;
+            font-size: 0.65rem; /* Reducido */
             color: var(--secondary);
-            margin-top: 2px;
+            margin-top: 2px; /* Reducido */
         }
 
         .action-bar {
@@ -164,16 +170,16 @@
             flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
-            gap: 10px;
+            margin-bottom: 8px; /* Reducido */
+            gap: 10px; /* Reducido */
         }
 
         .btn {
-            padding: 6px 14px;
+            padding: 6px 14px; /* Reducido */
             border: none;
-            border-radius: 6px;
+            border-radius: 6px; /* Reducido */
             font-weight: 600;
-            font-size: 0.75rem;
+            font-size: 0.75rem; /* Reducido */
             text-transform: uppercase;
             letter-spacing: 0.8px;
             cursor: pointer;
@@ -216,15 +222,19 @@
         }
 
         .btn:hover {
-            transform: translateY(-1px);
+            transform: translateY(-1px); /* Reducido */
             box-shadow: 0 3px 10px rgba(0,0,0,0.1);
         }
 
+        /* Botón de eliminar del header (solo icono) */
         .btn-icono {
             padding: 6px 10px;
             font-size: 1rem;
         }
 
+        /* ============================================ */
+        /* TABLA - MÁS REGISTROS VISIBLES */
+        /* ============================================ */
         .table-section {
             flex: 1;
             min-height: 0;
@@ -236,9 +246,9 @@
         .table-responsive {
             overflow-x: auto;
             overflow-y: auto;
-            border-radius: 8px;
+            border-radius: 8px; /* Reducido */
             border: 1px solid var(--gray);
-            max-height: 500px;
+            max-height: 500px; /* Aumentado para ver más registros */
             -webkit-overflow-scrolling: touch;
         }
 
@@ -251,8 +261,8 @@
         th {
             background-color: var(--primary);
             color: white;
-            padding: 8px 8px;
-            font-size: 0.7rem;
+            padding: 8px 8px; /* Reducido */
+            font-size: 0.7rem; /* Reducido */
             text-transform: uppercase;
             letter-spacing: 0.5px;
             text-align: left;
@@ -263,9 +273,9 @@
         }
 
         td {
-            padding: 6px 8px;
+            padding: 6px 8px; /* Reducido */
             border-bottom: 1px solid var(--gray);
-            font-size: 0.8rem;
+            font-size: 0.8rem; /* Reducido */
             vertical-align: middle;
             white-space: nowrap;
         }
@@ -275,9 +285,9 @@
         }
 
         .badge {
-            padding: 2px 8px;
+            padding: 2px 8px; /* Reducido */
             border-radius: 50px;
-            font-size: 0.65rem;
+            font-size: 0.65rem; /* Reducido */
             font-weight: 600;
             display: inline-block;
             text-transform: uppercase;
@@ -299,41 +309,44 @@
         .badge-turno {
             background-color: var(--primary);
             color: white;
-            padding: 2px 6px;
+            padding: 2px 6px; /* Reducido */
             border-radius: 20px;
-            font-size: 0.6rem;
+            font-size: 0.6rem; /* Reducido */
             display: inline-block;
             white-space: nowrap;
         }
 
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 40px 20px; /* Reducido */
             color: var(--secondary);
         }
 
         .empty-state h3 {
-            font-size: 1.2rem;
+            font-size: 1.2rem; /* Reducido */
             margin-bottom: 10px;
             color: var(--primary);
         }
 
         .btn-accion {
-            padding: 3px 8px;
-            font-size: 0.6rem;
+            padding: 3px 8px; /* Reducido */
+            font-size: 0.6rem; /* Reducido */
             white-space: nowrap;
         }
 
         .footer {
-            margin-top: 10px;
+            margin-top: 10px; /* Reducido */
             color: var(--secondary);
-            font-size: 0.65rem;
+            font-size: 0.65rem; /* Reducido */
             text-align: right;
             border-top: 1px solid var(--gray);
-            padding-top: 8px;
+            padding-top: 8px; /* Reducido */
             flex-shrink: 0;
         }
 
+        /* ============================================ */
+        /* MODALES (sin cambios) */
+        /* ============================================ */
         .password-modal {
             position: fixed;
             top: 0;
@@ -493,7 +506,7 @@
 </head>
 <body>
     <div class="container">
-        <!-- SECCIÓN FIJA -->
+        <!-- SECCIÓN FIJA - TODO HASTA EL ENCABEZADO DE LA TABLA -->
         <div class="fixed-header">
             <div class="header">
                 <div class="header-left">
@@ -504,14 +517,17 @@
                     <button class="btn btn-info" onclick="window.location.href='formulario.html'">
                         📝 NUEVO REGISTRO
                     </button>
+                    <!-- Botón de eliminar con icono 🗑️ (sin texto) -->
                     <button class="btn btn-danger btn-icono" onclick="toggleModoEliminacion()" id="btnEliminarHeader" style="padding: 6px 12px;">
                         🗑️
                     </button>
                 </div>
             </div>
 
+            <!-- FECHA FIJA - JUSTO ARRIBA DE LA TABLA -->
             <div class="fecha-fija" id="fechaActualizacion"></div>
 
+            <!-- ESTADÍSTICAS COMPACTAS -->
             <div class="stats-container" id="statsContainer">
                 <div class="stat-card">
                     <div class="stat-label">Registros HOY</div>
@@ -535,6 +551,7 @@
                 </div>
             </div>
 
+            <!-- BARRA DE ACCIÓN (ELIMINAR TODOS) -->
             <div class="action-bar">
                 <div class="btn-group" id="botonesEliminarTodo" style="display: none;">
                     <button class="btn btn-danger" onclick="eliminarTodosRegistros()">
@@ -544,7 +561,7 @@
             </div>
         </div>
 
-        <!-- TABLA -->
+        <!-- SECCIÓN DE TABLA CON SCROLL -->
         <div class="table-section">
             <div class="table-responsive">
                 <table id="tablaRepositorio">
@@ -600,7 +617,7 @@
 
     <script>
         // ============================================
-        // 🔥 CONFIGURACIÓN DE FIREBASE
+        // 🔥 CONFIGURACIÓN DE FIREBASE (CON TUS DATOS)
         // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyDD0lCq8rAnCm2KjsqSwzxlpUhQU2gRVfk",
@@ -611,6 +628,7 @@
             appId: "1:105080206085:web:443ba22aaf8cbcea767d6c"
         };
 
+        // Inicializar Firebase (usando compatibilidad)
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         
@@ -703,6 +721,7 @@
             if (modoEliminacionActivo) {
                 modoEliminacionActivo = false;
                 ocultarBotonesEliminar();
+                // Cambiar texto del botón del header (no hay texto, solo icono)
                 mostrarToast('🔒 Modo eliminación desactivado', '#F39C12');
             } else {
                 mostrarPasswordModal();
@@ -784,6 +803,7 @@
             document.getElementById('turnoStarbucks').textContent = `TURNO: ${turnoActual}`;
             
             try {
+                // 🔥 LEER DESDE FIRESTORE
                 const snapshot = await db.collection('registros').orderBy('fechaCaptura', 'desc').get();
                 
                 if (snapshot.empty) {
@@ -810,10 +830,6 @@
                 let html = '';
                 repositorio.forEach((registro) => {
                     const turnoSimple = extraerTurnoSimple(registro.turno);
-                    
-                    // 🔥 CRITERIOS CORREGIDOS:
-                    // DOMINOS PIZZA: cualquier texto que contenga EXACTAMENTE "DOMINOS PIZZA"
-                    // STARBUCKS: cualquier texto que contenga "STARBUCKS"
                     const totalDominos = parseInt(registro.resumen?.totalDominos) || 0;
                     const totalStarbucks = parseInt(registro.resumen?.totalStarbucks) || 0;
                     const totalTiendas = parseInt(registro.resumen?.totalTiendas) || 0;
@@ -884,105 +900,84 @@
         }
 
         // ============================================
-        // VER DETALLE - SOLO EN FIREBASE
+        // VER DETALLE
         // ============================================
-        async function verDetalle(id) {
-            mostrarLoader('Buscando registro...');
+        function verDetalle(id) {
+            const repositorio = JSON.parse(localStorage.getItem('repositorioCharolas')) || [];
+            const registro = repositorio.find(r => r.id === id);
             
-            try {
-                const doc = await db.collection('registros').doc(id).get();
-                
-                if (!doc.exists) {
-                    ocultarLoader();
-                    alert('❌ Registro no encontrado en Firebase');
-                    return;
-                }
-
-                const registro = doc.data();
-                ocultarLoader();
-
-                const turnoSimple = extraerTurnoSimple(registro.turno);
-                
-                let fechaParte = 'N/A';
-                let horaParte = 'N/A';
-                
-                if (registro.fechaCaptura) {
-                    const partesFecha = registro.fechaCaptura.split(',');
-                    if (partesFecha.length > 0) fechaParte = partesFecha[0].trim();
-                    if (partesFecha.length > 1) horaParte = partesFecha[1].trim();
-                }
-
-                const comentarios = registro.datosGenerales?.comentarios || 'S/N';
-
-                let html = `
-                    <div class="detalle-info">
-                        <div class="detalle-linea1">
-                            <span><strong>Fecha:</strong> ${fechaParte}</span>
-                            <span><strong>Hora:</strong> ${horaParte}</span>
-                            <span><strong>Turno:</strong> ${turnoSimple}</span>
-                            <span><strong>No. Empleado:</strong> ${registro.datosGenerales?.noEmpleado || ''}</span>
-                            <span><strong>Ruta:</strong> ${registro.datosGenerales?.ruta || ''}</span>
-                            <span><strong>Bitácora:</strong> ${registro.datosGenerales?.bitacora || ''}</span>
-                            <span><strong>Unidad:</strong> ${registro.datosGenerales?.unidad || ''}</span>
-                        </div>
-                        <div class="detalle-linea2">
-                            <strong>Comentarios:</strong> ${comentarios}
-                        </div>
-                    </div>
-                    
-                    <h3 style="margin-bottom: 15px; color: var(--primary);">📋 TIENDAS CAPTURADAS</h3>
-                    
-                    <table class="detalle-table">
-                        <thead>
-                            <tr>
-                                <th>TIENDA</th>
-                                <th>CANTIDAD</th>
-                                <th>DIFERENCIA</th>
-                                <th>CNT. FÍSICA</th>
-                                <th>TIPO</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-                
-                if (registro.registros && registro.registros.length > 0) {
-                    registro.registros.forEach(tienda => {
-                        const tipoUpper = (tienda.tipo || '').toUpperCase();
-                        // 🔥 CRITERIOS CORREGIDOS EN DETALLE
-                        const badgeClass = tipoUpper.includes('DOMINOS PIZZA') ? 'badge-dominos' : 
-                                          (tipoUpper.includes('STARBUCKS') ? 'badge-starbucks' : '');
-                        
-                        html += `
-                            <tr>
-                                <td>${tienda.tienda || ''}</td>
-                                <td style="text-align: center;">${parseFloat(tienda.cantidadBitacora) || 0}</td>
-                                <td style="text-align: center;">${parseFloat(tienda.diferencia) || 0}</td>
-                                <td style="text-align: center; font-weight: 600;">${parseFloat(tienda.cantidadFisica) || 0}</td>
-                                <td><span class="badge ${badgeClass}">${tienda.tipo || ''}</span></td>
-                            </tr>
-                        `;
-                    });
-                } else {
-                    html += `<tr><td colspan="5" style="text-align:center;">No hay tiendas en este registro</td></tr>`;
-                }
-                
-                html += `
-                        </tbody>
-                    </table>
-                    
-                    <div style="margin-top: 20px; padding: 15px; background: var(--light); border-radius: 8px;">
-                        <p><strong>RESUMEN:</strong> Total tiendas: ${registro.resumen?.totalTiendas || 0} | Domino's: ${registro.resumen?.totalDominos || 0} | Starbucks: ${registro.resumen?.totalStarbucks || 0}</p>
-                    </div>
-                `;
-                
-                document.getElementById('detalleContenido').innerHTML = html;
-                document.getElementById('detalleModal').style.display = 'flex';
-                
-            } catch (error) {
-                ocultarLoader();
-                alert('❌ Error al buscar en Firebase: ' + error.message);
-                console.error(error);
+            if (!registro) {
+                alert('Registro no encontrado');
+                return;
             }
+
+            const turnoSimple = extraerTurnoSimple(registro.turno);
+            
+            let fechaParte = 'N/A';
+            let horaParte = 'N/A';
+            
+            if (registro.fechaCaptura) {
+                const partesFecha = registro.fechaCaptura.split(',');
+                if (partesFecha.length > 0) fechaParte = partesFecha[0].trim();
+                if (partesFecha.length > 1) horaParte = partesFecha[1].trim();
+            }
+
+            const comentarios = registro.datosGenerales?.comentarios || 'S/N';
+
+            let html = `
+                <div class="detalle-info">
+                    <div class="detalle-linea1">
+                        <span><strong>Fecha:</strong> ${fechaParte}</span>
+                        <span><strong>Hora:</strong> ${horaParte}</span>
+                        <span><strong>Turno:</strong> ${turnoSimple}</span>
+                        <span><strong>No. Empleado:</strong> ${registro.datosGenerales?.noEmpleado || ''}</span>
+                        <span><strong>Ruta:</strong> ${registro.datosGenerales?.ruta || ''}</span>
+                        <span><strong>Bitácora:</strong> ${registro.datosGenerales?.bitacora || ''}</span>
+                        <span><strong>Unidad:</strong> ${registro.datosGenerales?.unidad || ''}</span>
+                    </div>
+                    <div class="detalle-linea2">
+                        <strong>Comentarios:</strong> ${comentarios}
+                    </div>
+                </div>
+                
+                <h3 style="margin-bottom: 15px; color: var(--primary);">📋 TIENDAS CAPTURADAS</h3>
+                
+                <table class="detalle-table">
+                    <thead>
+                        <tr>
+                            <th>TIENDA</th>
+                            <th>CANTIDAD</th>
+                            <th>DIFERENCIA</th>
+                            <th>CNT. FÍSICA</th>
+                            <th>TIPO</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            registro.registros.forEach(tienda => {
+                html += `
+                    <tr>
+                        <td>${tienda.tienda || ''}</td>
+                        <td style="text-align: center;">${parseFloat(tienda.cantidadBitacora) || 0}</td>
+                        <td style="text-align: center;">${parseFloat(tienda.diferencia) || 0}</td>
+                        <td style="text-align: center; font-weight: 600;">${parseFloat(tienda.cantidadFisica) || 0}</td>
+                        <td><span class="badge ${tienda.tipo === 'DOMINO\'S' ? 'badge-dominos' : 'badge-starbucks'}">${tienda.tipo || ''}</span></td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                    </tbody>
+                </table>
+                
+                <div style="margin-top: 20px; padding: 15px; background: var(--light); border-radius: 8px;">
+                    <p><strong>RESUMEN:</strong> Total tiendas: ${registro.resumen?.totalTiendas || 0} | Domino's: ${registro.resumen?.totalDominos || 0} | Starbucks: ${registro.resumen?.totalStarbucks || 0}</p>
+                </div>
+            `;
+            
+            document.getElementById('detalleContenido').innerHTML = html;
+            document.getElementById('detalleModal').style.display = 'flex';
         }
 
         function cerrarDetalleModal() {
@@ -1001,6 +996,12 @@
             
             try {
                 await db.collection('registros').doc(id).delete();
+                
+                // También eliminar de localStorage si existe
+                let repositorio = JSON.parse(localStorage.getItem('repositorioCharolas')) || [];
+                repositorio = repositorio.filter(r => r.id !== id);
+                localStorage.setItem('repositorioCharolas', JSON.stringify(repositorio));
+                
                 mostrarToast('🗑️ Registro eliminado de Firebase', '#E74C3C');
                 cargarDatos();
             } catch (error) {
@@ -1017,7 +1018,7 @@
                 return;
             }
             if (!confirm('⚠️ ¿ESTÁS SEGURO?\n\nEsto eliminará TODOS los registros guardados permanentemente.\n\nEsta acción NO se puede deshacer.')) return;
-            if (!confirm('ÚLTIMA CONFIRMACIÓN:\n\n¿Eliminar toda la base de datos?')) return;
+            if (!confirm('ÚLTINA CONFIRMACIÓN:\n\n¿Eliminar toda la base de datos?')) return;
             
             try {
                 const snapshot = await db.collection('registros').get();
@@ -1026,6 +1027,9 @@
                     batch.delete(doc.ref);
                 });
                 await batch.commit();
+                
+                // También limpiar localStorage
+                localStorage.removeItem('repositorioCharolas');
                 
                 modoEliminacionActivo = false;
                 ocultarBotonesEliminar();
@@ -1044,6 +1048,7 @@
             cargarDatos();
             ocultarBotonesEliminar();
             
+            // Manejador para el botón de eliminar del header
             const btnEliminarHeader = document.getElementById('btnEliminarHeader');
             if (btnEliminarHeader) {
                 btnEliminarHeader.addEventListener('click', function(e) {
@@ -1054,30 +1059,6 @@
             
             setInterval(cargarDatos, 60000);
         });
-
-        function mostrarLoader(mensaje = 'Cargando...') {
-            const toast = document.createElement('div');
-            toast.textContent = mensaje;
-            toast.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background-color: var(--accent);
-                color: white;
-                padding: 10px 18px;
-                border-radius: 8px;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-                z-index: 9999;
-                animation: slideIn 0.3s;
-                font-size: 0.85rem;
-            `;
-            document.body.appendChild(toast);
-            setTimeout(() => { toast.remove(); }, 2000);
-        }
-
-        function ocultarLoader() {
-            // No hace nada, el toast se quita solo
-        }
     </script>
 </body>
 </html>
