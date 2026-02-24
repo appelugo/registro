@@ -249,31 +249,53 @@
             return t ? { nombre: (t.tienda || '').toUpperCase(), marca: (t.marca || '').toUpperCase() } : { nombre: '', marca: '' };
         }
 
+        // 🔧 CAMBIO 2: Sumatoria de cantidad física (MODIFICADA)
         function actualizarTotales() {
             let totalDominos = 0;
             let totalStarbucks = 0;
             
             document.querySelectorAll('#tablaBody tr').forEach(fila => {
+                // Obtener el CECO y la cantidad física
                 const inputs = fila.querySelectorAll('input');
                 if (inputs.length > 0) {
                     const ceco = inputs[0]?.value.trim().toUpperCase() || '';
+                    const cantidadFisica = parseFloat(fila.cells[7]?.textContent) || 0;
+                    
                     if (ceco) {
                         const datos = obtenerDatosTienda(ceco);
-                        if (datos.marca.includes('DOMINO')) totalDominos++;
-                        else if (datos.marca.includes('STARBUCKS') || datos.marca.includes('CHILIS')) totalStarbucks++;
+                        if (datos.marca.includes('DOMINO')) {
+                            totalDominos += cantidadFisica;
+                        } else if (datos.marca.includes('STARBUCKS') || datos.marca.includes('CHILIS')) {
+                            totalStarbucks += cantidadFisica;
+                        }
                     }
                 }
             });
             
-            document.getElementById('totalDominos').textContent = totalDominos;
-            document.getElementById('totalStarbucks').textContent = totalStarbucks;
+            document.getElementById('totalDominos').textContent = Math.round(totalDominos);
+            document.getElementById('totalStarbucks').textContent = Math.round(totalStarbucks);
         }
 
+        // 🔧 CAMBIO 1: Validar CECO duplicado (NUEVA FUNCIÓN)
+        function cecoYaExiste(ceco, filaActual) {
+            const filas = document.querySelectorAll('#tablaBody tr');
+            for (let fila of filas) {
+                if (fila === filaActual) continue; // Ignorar la misma fila
+                const inputCeco = fila.querySelector('td:first-child input');
+                if (inputCeco && inputCeco.value.trim().toUpperCase() === ceco) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // 🔧 CAMBIO 1: Validar tienda (MODIFICADA para incluir duplicados)
         function validarTienda(input) {
             const ceco = input.value.trim().toUpperCase();
+            const fila = input.closest('tr');
+            
             if (!ceco) {
                 input.classList.remove('valido', 'error');
-                const fila = input.closest('tr');
                 if (fila) {
                     fila.cells[1].innerHTML = '<span class="texto-tabla"></span>';
                     fila.cells[2].innerHTML = '<span class="badge"></span>';
@@ -282,12 +304,26 @@
                 return;
             }
 
+            // Verificar duplicado
+            if (cecoYaExiste(ceco, fila)) {
+                input.classList.add('error');
+                input.classList.remove('valido');
+                input.setCustomValidity('CECO duplicado');
+                mostrarToast('⚠️ Este CECO ya existe en la tabla', '#F39C12');
+                if (fila) {
+                    fila.cells[1].innerHTML = '<span class="texto-tabla" style="color:var(--danger);">CECO DUPLICADO</span>';
+                    fila.cells[2].innerHTML = '<span class="badge"></span>';
+                }
+                actualizarTotales();
+                return;
+            }
+
             const datos = obtenerDatosTienda(ceco);
-            const fila = input.closest('tr');
             
             if (datos.nombre || datos.marca) {
                 input.classList.add('valido');
                 input.classList.remove('error');
+                input.setCustomValidity('');
                 if (fila) {
                     fila.cells[1].innerHTML = `<span class="texto-tabla">${datos.nombre}</span>`;
                     
@@ -300,6 +336,7 @@
             } else {
                 input.classList.add('error');
                 input.classList.remove('valido');
+                input.setCustomValidity('CECO no encontrado en organigrama');
                 if (fila) {
                     fila.cells[1].innerHTML = '<span class="texto-tabla" style="color:var(--danger);">NO ENCONTRADO</span>';
                     fila.cells[2].innerHTML = '<span class="badge"></span>';
@@ -461,6 +498,7 @@
             }
         }
 
+        // 🔧 CAMBIO 3: Mostrar REMISIÓN y COMPLEMENTO (VERIFICADO)
         function mostrarRegistroExistente(r) {
             const tbody = document.getElementById('tablaBody');
             tbody.innerHTML = '';
@@ -469,8 +507,11 @@
                 r.registros.forEach((t, i) => {
                     const d = obtenerDatosTienda(t.tienda);
                     const badge = d.marca.includes('DOMINO') ? 'badge-dominos' : 'badge-starbucks';
-                    const rem = (r.validacion?.tiendas?.[i]?.remision || '').toUpperCase();
-                    const com = (r.validacion?.tiendas?.[i]?.complemento || '').toUpperCase();
+                    
+                    // 🔧 Obtener remisión y complemento de validacion.tiendas (si existe)
+                    const rem = (r.validacion?.tiendas && r.validacion.tiendas[i]?.remision || '').toUpperCase();
+                    const com = (r.validacion?.tiendas && r.validacion.tiendas[i]?.complemento || '').toUpperCase();
+                    
                     const fila = document.createElement('tr');
                     fila.innerHTML = `
                         <td><input type="text" class="table-input" value="${(t.tienda||'').toUpperCase()}" placeholder="CECO" readonly onblur="validarTienda(this)" oninput="this.value=this.value.toUpperCase()"></td>
@@ -525,12 +566,10 @@
                     
                     const datos = obtenerDatosTienda(ceco);
                     
-                    // 🔴 CORRECCIÓN: Conservar cantidades originales si existen
                     let cantidadBitacora = 0;
                     let diferencia = 0;
                     let cantidadFisica = 0;
                     
-                    // Si es un registro existente, buscar la tienda original
                     if (registroActual && registroActual.registros) {
                         const tiendaOriginal = registroActual.registros.find(t => t.tienda === ceco);
                         if (tiendaOriginal) {
@@ -550,8 +589,8 @@
                         complemento
                     });
 
-                    if (datos.marca?.includes('DOMINO')) totalDominos++;
-                    else if (datos.marca?.includes('STARBUCKS') || datos.marca?.includes('CHILIS')) totalStarbucks++;
+                    if (datos.marca?.includes('DOMINO')) totalDominos += cantidadFisica;
+                    else if (datos.marca?.includes('STARBUCKS') || datos.marca?.includes('CHILIS')) totalStarbucks += cantidadFisica;
                 });
 
                 const nombreValidador = (sessionStorage.getItem('usuarioNombre') || sessionStorage.getItem('usuarioEmpleado') || 'VALIDADOR').toUpperCase();
@@ -666,6 +705,17 @@
             document.getElementById('mensajeError').style.display = 'block'; 
         }
         function ocultarError() { document.getElementById('mensajeError').style.display = 'none'; }
+        function mostrarToast(mensaje, color) {
+            const toast = document.createElement('div');
+            toast.textContent = mensaje;
+            toast.style.cssText = `
+                position: fixed; top: 20px; right: 20px; background-color: ${color};
+                color: white; padding: 10px 18px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                z-index: 9999; animation: slideIn 0.3s; font-size: 0.85rem;
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
     </script>
 </body>
 </html>
