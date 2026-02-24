@@ -892,11 +892,12 @@
         const db = firebase.firestore();
         
         // ============================================
-        // VARIABLES GLOBALES
+        // VARIABLES GLOBALES (MODIFICADO)
         // ============================================
         let totalFilas = 0;
         let ultimoRegistroGuardado = null;
         let listaCECOs = [];
+        let datosCompletosOrganigrama = [];
         const PASSWORD_CORRECTA = 'Hapack90.';
 
         if (window.history.replaceState) {
@@ -911,20 +912,34 @@
         });
 
         // ============================================
-        // CARGAR CECOs DESDE FIREBASE
+        // CARGAR CECOs Y DATOS COMPLETOS DESDE FIREBASE (MODIFICADO)
         // ============================================
         async function cargarCECOs() {
             try {
                 const snapshot = await db.collection('organigrama').doc('lista_cecos').get();
                 if (snapshot.exists) {
-                    listaCECOs = snapshot.data().cecos || [];
+                    const data = snapshot.data();
+                    listaCECOs = data.cecos || [];
+                    datosCompletosOrganigrama = data.datosCompletos || [];
                     console.log(`✅ CECOs cargados: ${listaCECOs.length}`);
+                    console.log(`✅ Datos completos: ${datosCompletosOrganigrama.length}`);
                 } else {
                     console.log('No hay organigrama cargado aún');
                 }
             } catch (error) {
                 console.error('Error cargando CECOs:', error);
             }
+        }
+
+        // ============================================
+        // NUEVA FUNCIÓN: OBTENER MARCA DESDE ORGANIGRAMA
+        // ============================================
+        function obtenerMarcaDesdeOrganigrama(ceco) {
+            if (!datosCompletosOrganigrama || datosCompletosOrganigrama.length === 0) {
+                return null;
+            }
+            const tienda = datosCompletosOrganigrama.find(item => String(item.ceco).trim() === String(ceco).trim());
+            return tienda ? tienda.marca || null : null;
         }
 
         // ============================================
@@ -944,148 +959,139 @@
             document.getElementById('fileOrganigrama').value = '';
         }
 
-// ============================================
-// PROCESAR ARCHIVO EXCEL - CON VISTA PREVIA
-// ============================================
-async function procesarOrganigrama() {
-    const fileInput = document.getElementById('fileOrganigrama');
-    const file = fileInput.files[0];
-    
-    if (!file) {
-        alert('❌ Selecciona un archivo');
-        return;
-    }
-
-    mostrarLoader('Leyendo archivo Excel...');
-
-    const reader = new FileReader();
-    reader.onload = async function(e) {
-        try {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-            // Verificar que hay datos
-            if (rows.length < 2) {
-                throw new Error('El archivo está vacío');
+        // ============================================
+        // PROCESAR ARCHIVO EXCEL - CON VISTA PREVIA
+        // ============================================
+        async function procesarOrganigrama() {
+            const fileInput = document.getElementById('fileOrganigrama');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('❌ Selecciona un archivo');
+                return;
             }
 
-            const headers = rows[0];
-            
-            // Mapeo de columnas según el orden especificado
-            const columnas = {
-                CEDIS: -1,
-                MARCA: -1,
-                CECO: -1,
-                STATUS: -1,
-                TIENDA: -1,
-                TIPO_UNIDAD: -1,
-                ESTADO: -1
-            };
-            
-            // Identificar índices de columnas (búsqueda flexible)
-            headers.forEach((header, index) => {
-                const h = String(header).toUpperCase().trim();
-                if (h.includes('CEDIS')) columnas.CEDIS = index;
-                if (h.includes('MARCA')) columnas.MARCA = index;
-                if (h.includes('CECO')) columnas.CECO = index;
-                if (h.includes('STATUS')) columnas.STATUS = index;
-                if (h.includes('TIENDA') && !h.includes('TIPO')) columnas.TIENDA = index;
-                if (h.includes('TIPO DE UNIDAD') || h.includes('TIPO UNIDAD')) columnas.TIPO_UNIDAD = index;
-                if (h.includes('ESTADO')) columnas.ESTADO = index;
-            });
+            mostrarLoader('Leyendo archivo Excel...');
 
-            if (columnas.CECO === -1) {
-                throw new Error('No se encontró la columna CECO en el archivo');
-            }
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-            // Extraer datos completos
-            const cecos = [];
-            const datosCompletos = [];
-            
-            for (let i = 1; i < rows.length; i++) {
-                const fila = rows[i];
-                if (fila && fila[columnas.CECO]) {
-                    const ceco = String(fila[columnas.CECO]).trim();
-                    cecos.push(ceco);
+                    if (rows.length < 2) {
+                        throw new Error('El archivo está vacío');
+                    }
+
+                    const headers = rows[0];
                     
-                    datosCompletos.push({
-                        cedis: columnas.CEDIS !== -1 && fila[columnas.CEDIS] ? String(fila[columnas.CEDIS]).trim() : '',
-                        marca: columnas.MARCA !== -1 && fila[columnas.MARCA] ? String(fila[columnas.MARCA]).trim() : '',
-                        ceco: ceco,
-                        status: columnas.STATUS !== -1 && fila[columnas.STATUS] ? String(fila[columnas.STATUS]).trim() : '',
-                        tienda: columnas.TIENDA !== -1 && fila[columnas.TIENDA] ? String(fila[columnas.TIENDA]).trim() : '',
-                        tipoUnidad: columnas.TIPO_UNIDAD !== -1 && fila[columnas.TIPO_UNIDAD] ? String(fila[columnas.TIPO_UNIDAD]).trim() : '',
-                        estado: columnas.ESTADO !== -1 && fila[columnas.ESTADO] ? String(fila[columnas.ESTADO]).trim() : ''
+                    const columnas = {
+                        CEDIS: -1,
+                        MARCA: -1,
+                        CECO: -1,
+                        STATUS: -1,
+                        TIENDA: -1,
+                        TIPO_UNIDAD: -1,
+                        ESTADO: -1
+                    };
+                    
+                    headers.forEach((header, index) => {
+                        const h = String(header).toUpperCase().trim();
+                        if (h.includes('CEDIS')) columnas.CEDIS = index;
+                        if (h.includes('MARCA')) columnas.MARCA = index;
+                        if (h.includes('CECO')) columnas.CECO = index;
+                        if (h.includes('STATUS')) columnas.STATUS = index;
+                        if (h.includes('TIENDA') && !h.includes('TIPO')) columnas.TIENDA = index;
+                        if (h.includes('TIPO DE UNIDAD') || h.includes('TIPO UNIDAD')) columnas.TIPO_UNIDAD = index;
+                        if (h.includes('ESTADO')) columnas.ESTADO = index;
                     });
+
+                    if (columnas.CECO === -1) {
+                        throw new Error('No se encontró la columna CECO en el archivo');
+                    }
+
+                    const cecos = [];
+                    const datosCompletos = [];
+                    
+                    for (let i = 1; i < rows.length; i++) {
+                        const fila = rows[i];
+                        if (fila && fila[columnas.CECO]) {
+                            const ceco = String(fila[columnas.CECO]).trim();
+                            cecos.push(ceco);
+                            
+                            datosCompletos.push({
+                                cedis: columnas.CEDIS !== -1 && fila[columnas.CEDIS] ? String(fila[columnas.CEDIS]).trim() : '',
+                                marca: columnas.MARCA !== -1 && fila[columnas.MARCA] ? String(fila[columnas.MARCA]).trim() : '',
+                                ceco: ceco,
+                                status: columnas.STATUS !== -1 && fila[columnas.STATUS] ? String(fila[columnas.STATUS]).trim() : '',
+                                tienda: columnas.TIENDA !== -1 && fila[columnas.TIENDA] ? String(fila[columnas.TIENDA]).trim() : '',
+                                tipoUnidad: columnas.TIPO_UNIDAD !== -1 && fila[columnas.TIPO_UNIDAD] ? String(fila[columnas.TIPO_UNIDAD]).trim() : '',
+                                estado: columnas.ESTADO !== -1 && fila[columnas.ESTADO] ? String(fila[columnas.ESTADO]).trim() : ''
+                            });
+                        }
+                    }
+
+                    ocultarLoader();
+                    
+                    let mensajePreview = `📋 **VISTA PREVIA DEL ORGANIGRAMA**\n\n`;
+                    mensajePreview += `Total de registros: ${datosCompletos.length}\n`;
+                    mensajePreview += `Columnas detectadas:\n`;
+                    mensajePreview += `- CEDIS: ${columnas.CEDIS !== -1 ? '✓' : '✗'}\n`;
+                    mensajePreview += `- MARCA: ${columnas.MARCA !== -1 ? '✓' : '✗'}\n`;
+                    mensajePreview += `- CECO: ✓\n`;
+                    mensajePreview += `- STATUS: ${columnas.STATUS !== -1 ? '✓' : '✗'}\n`;
+                    mensajePreview += `- TIENDA: ${columnas.TIENDA !== -1 ? '✓' : '✗'}\n`;
+                    mensajePreview += `- TIPO UNIDAD: ${columnas.TIPO_UNIDAD !== -1 ? '✓' : '✗'}\n`;
+                    mensajePreview += `- ESTADO: ${columnas.ESTADO !== -1 ? '✓' : '✗'}\n\n`;
+                    
+                    mensajePreview += `**PRIMEROS 5 REGISTROS:**\n`;
+                    
+                    for (let i = 0; i < Math.min(5, datosCompletos.length); i++) {
+                        const reg = datosCompletos[i];
+                        mensajePreview += `\n${i+1}. CECO: ${reg.ceco}\n`;
+                        if (reg.cedis) mensajePreview += `   CEDIS: ${reg.cedis}\n`;
+                        if (reg.marca) mensajePreview += `   MARCA: ${reg.marca}\n`;
+                        if (reg.status) mensajePreview += `   STATUS: ${reg.status}\n`;
+                        if (reg.tienda) mensajePreview += `   TIENDA: ${reg.tienda}\n`;
+                        if (reg.tipoUnidad) mensajePreview += `   TIPO UNIDAD: ${reg.tipoUnidad}\n`;
+                        if (reg.estado) mensajePreview += `   ESTADO: ${reg.estado}\n`;
+                    }
+
+                    if (confirm(mensajePreview + '\n\n¿Los datos son correctos? Presiona OK para guardar en Firebase.')) {
+                        
+                        mostrarLoader(`Guardando ${datosCompletos.length} registros en Firebase...`);
+
+                        await db.collection('organigrama').doc('lista_cecos').set({
+                            cecos: cecos,
+                            datosCompletos: datosCompletos,
+                            fecha_actualizacion: new Date().toLocaleString(),
+                            total: datosCompletos.length
+                        });
+
+                        // Actualizar lista local (MODIFICADO)
+                        listaCECOs = cecos;
+                        datosCompletosOrganigrama = datosCompletos;
+
+                        ocultarLoader();
+                        alert(`✅ Organigrama cargado exitosamente con ${datosCompletos.length} registros`);
+                        cerrarModalOrganigrama();
+                        
+                    } else {
+                        alert('❌ Carga cancelada. Revisa el archivo e inténtalo de nuevo.');
+                    }
+
+                } catch (error) {
+                    ocultarLoader();
+                    alert('❌ Error procesando archivo: ' + error.message);
+                    console.error('Error detallado:', error);
                 }
-            }
+            };
 
-            // ============================================
-            // VISTA PREVIA - Mostrar primeros 5 registros
-            // ============================================
-            ocultarLoader();
-            
-            // Crear mensaje de vista previa
-            let mensajePreview = `📋 **VISTA PREVIA DEL ORGANIGRAMA**\n\n`;
-            mensajePreview += `Total de registros: ${datosCompletos.length}\n`;
-            mensajePreview += `Columnas detectadas:\n`;
-            mensajePreview += `- CEDIS: ${columnas.CEDIS !== -1 ? '✓' : '✗'}\n`;
-            mensajePreview += `- MARCA: ${columnas.MARCA !== -1 ? '✓' : '✗'}\n`;
-            mensajePreview += `- CECO: ✓\n`;
-            mensajePreview += `- STATUS: ${columnas.STATUS !== -1 ? '✓' : '✗'}\n`;
-            mensajePreview += `- TIENDA: ${columnas.TIENDA !== -1 ? '✓' : '✗'}\n`;
-            mensajePreview += `- TIPO UNIDAD: ${columnas.TIPO_UNIDAD !== -1 ? '✓' : '✗'}\n`;
-            mensajePreview += `- ESTADO: ${columnas.ESTADO !== -1 ? '✓' : '✗'}\n\n`;
-            
-            mensajePreview += `**PRIMEROS 5 REGISTROS:**\n`;
-            
-            for (let i = 0; i < Math.min(5, datosCompletos.length); i++) {
-                const reg = datosCompletos[i];
-                mensajePreview += `\n${i+1}. CECO: ${reg.ceco}\n`;
-                if (reg.cedis) mensajePreview += `   CEDIS: ${reg.cedis}\n`;
-                if (reg.marca) mensajePreview += `   MARCA: ${reg.marca}\n`;
-                if (reg.status) mensajePreview += `   STATUS: ${reg.status}\n`;
-                if (reg.tienda) mensajePreview += `   TIENDA: ${reg.tienda}\n`;
-                if (reg.tipoUnidad) mensajePreview += `   TIPO UNIDAD: ${reg.tipoUnidad}\n`;
-                if (reg.estado) mensajePreview += `   ESTADO: ${reg.estado}\n`;
-            }
-
-            // Preguntar al usuario si desea continuar
-            if (confirm(mensajePreview + '\n\n¿Los datos son correctos? Presiona OK para guardar en Firebase.')) {
-                
-                mostrarLoader(`Guardando ${datosCompletos.length} registros en Firebase...`);
-
-                // 🔥 GUARDAR EN FIREBASE (REEMPLAZANDO DATOS ANTERIORES)
-                await db.collection('organigrama').doc('lista_cecos').set({
-                    cecos: cecos,
-                    datosCompletos: datosCompletos,
-                    fecha_actualizacion: new Date().toLocaleString(),
-                    total: datosCompletos.length
-                });
-
-                // Actualizar lista local
-                listaCECOs = cecos;
-
-                ocultarLoader();
-                alert(`✅ Organigrama cargado exitosamente con ${datosCompletos.length} registros`);
-                cerrarModalOrganigrama();
-                
-            } else {
-                // Usuario canceló
-                alert('❌ Carga cancelada. Revisa el archivo e inténtalo de nuevo.');
-            }
-
-        } catch (error) {
-            ocultarLoader();
-            alert('❌ Error procesando archivo: ' + error.message);
-            console.error('Error detallado:', error);
+            reader.readAsArrayBuffer(file);
         }
-    };
 
-    reader.readAsArrayBuffer(file);
-}
         // ============================================
         // ✅ VALIDAR TIENDA CON COLORES
         // ============================================
@@ -1093,7 +1099,6 @@ async function procesarOrganigrama() {
             const tienda = input.value.trim();
             
             if (!tienda) {
-                // Campo vacío - sin color
                 input.classList.remove('valido');
                 input.classList.remove('error');
                 return true;
@@ -1102,12 +1107,10 @@ async function procesarOrganigrama() {
             const existe = listaCECOs.includes(tienda);
             
             if (existe) {
-                // ✅ VÁLIDO - Verde
                 input.classList.add('valido');
                 input.classList.remove('error');
                 return true;
             } else {
-                // ❌ NO VÁLIDO - Rojo
                 input.classList.add('error');
                 input.classList.remove('valido');
                 return false;
@@ -1254,24 +1257,49 @@ async function procesarOrganigrama() {
             actualizarTotales();
         }
 
+        // ============================================
+        // DETERMINAR TIPO (MODIFICADO - USA ORGANIGRAMA)
+        // ============================================
         function determinarTipo(elemento) {
             const fila = elemento.closest('tr');
             if (!fila) return;
             const inputs = fila.querySelectorAll('input');
             if (inputs.length < 5) return;
+            
             const tienda = inputs[0].value.trim();
-            let tipo = '';
-            if (tienda.startsWith('1')) {
-                tipo = 'DOMINO\'S';
-                inputs[4].value = tipo;
-                inputs[4].className = 'table-input badge badge-dominos';
-            } else if (tienda.length > 0) {
-                tipo = 'STARBUCKS';
-                inputs[4].value = tipo;
-                inputs[4].className = 'table-input badge badge-starbucks';
-            } else {
+            
+            if (!tienda) {
                 inputs[4].value = '';
                 inputs[4].className = 'table-input';
+                actualizarTotales();
+                return;
+            }
+
+            // Buscar marca en organigrama
+            const marcaOrganigrama = obtenerMarcaDesdeOrganigrama(tienda);
+            
+            if (marcaOrganigrama) {
+                inputs[4].value = marcaOrganigrama.toUpperCase();
+                
+                if (marcaOrganigrama.toUpperCase().includes('DOMINO')) {
+                    inputs[4].className = 'table-input badge badge-dominos';
+                } else if (marcaOrganigrama.toUpperCase().includes('STARBUCKS') || marcaOrganigrama.toUpperCase().includes('CHILIS')) {
+                    inputs[4].className = 'table-input badge badge-starbucks';
+                } else {
+                    inputs[4].className = 'table-input';
+                }
+            } else {
+                // Fallback al método anterior
+                if (tienda.startsWith('1')) {
+                    inputs[4].value = 'DOMINO\'S';
+                    inputs[4].className = 'table-input badge badge-dominos';
+                } else if (tienda.length > 0) {
+                    inputs[4].value = 'STARBUCKS';
+                    inputs[4].className = 'table-input badge badge-starbucks';
+                } else {
+                    inputs[4].value = '';
+                    inputs[4].className = 'table-input';
+                }
             }
             actualizarTotales();
         }
@@ -1294,9 +1322,9 @@ async function procesarOrganigrama() {
         }
 
         // ============================================
-        // VALIDAR Y GUARDAR (CON VALIDACIÓN DE ORGANIGRAMA)
+        // VALIDAR Y GUARDAR (MODIFICADO - VERIFICA BITÁCORA ÚNICA)
         // ============================================
-        function validarYGuardar() {
+        async function validarYGuardar() {
             if (!validarCamposObligatorios()) {
                 return;
             }
@@ -1327,6 +1355,26 @@ async function procesarOrganigrama() {
                 alert('❌ Hay tiendas que no existen en el organigrama. Por favor, verifica los campos en rojo.');
                 if (primerError) primerError.focus();
                 return;
+            }
+            
+            // Verificar si la bitácora ya existe
+            const bitacora = document.getElementById('bitacora').value.trim();
+            if (bitacora) {
+                mostrarLoader('Verificando bitácora...');
+                try {
+                    const snapshot = await db.collection('registros')
+                        .where('datosGenerales.bitacora', '==', bitacora)
+                        .get();
+                    
+                    if (!snapshot.empty) {
+                        ocultarLoader();
+                        alert('❌ Esta bitácora ya existe. No se puede guardar otro registro con el mismo número.');
+                        return;
+                    }
+                } catch (error) {
+                    console.error('Error verificando bitácora:', error);
+                }
+                ocultarLoader();
             }
             
             guardarEnRepositorio();
@@ -1516,6 +1564,3 @@ async function procesarOrganigrama() {
     </script>
 </body>
 </html>
-
-
-
