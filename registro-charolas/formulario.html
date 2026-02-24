@@ -1278,30 +1278,29 @@
             // Buscar marca en organigrama
             const marcaOrganigrama = obtenerMarcaDesdeOrganigrama(tienda);
             
-            if (marcaOrganigrama) {
-                inputs[4].value = marcaOrganigrama.toUpperCase();
-                
-                if (marcaOrganigrama.toUpperCase().includes('DOMINO')) {
-                    inputs[4].className = 'table-input badge badge-dominos';
-                } else if (marcaOrganigrama.toUpperCase().includes('STARBUCKS') || marcaOrganigrama.toUpperCase().includes('CHILIS')) {
-                    inputs[4].className = 'table-input badge badge-starbucks';
-                } else {
-                    inputs[4].className = 'table-input';
-                }
-            } else {
-                // Fallback al método anterior
-                if (tienda.startsWith('1')) {
-                    inputs[4].value = 'DOMINO\'S';
-                    inputs[4].className = 'table-input badge badge-dominos';
-                } else if (tienda.length > 0) {
-                    inputs[4].value = 'STARBUCKS';
-                    inputs[4].className = 'table-input badge badge-starbucks';
-                } else {
-                    inputs[4].value = '';
-                    inputs[4].className = 'table-input';
-                }
-            }
-            actualizarTotales();
+            // ✅ NUEVO - solo usa organigrama, sin fallback
+if (marcaOrganigrama) {
+    const marca = marcaOrganigrama.toUpperCase();
+    inputs[4].value = marca;
+
+    if (marca.includes('DOMINO')) {
+        inputs[4].className = 'table-input badge badge-dominos';
+    } else if (marca.includes('STARBUCKS')) {
+        inputs[4].className = 'table-input badge badge-starbucks';
+    } else {
+        // CHILIS u otras marcas — badge neutro
+        inputs[4].className = 'table-input badge';
+        inputs[4].style.backgroundColor = 'rgba(243,156,18,0.1)';
+        inputs[4].style.color = '#E67E22';
+        inputs[4].style.border = '1px solid #E67E22';
+    }
+} else {
+    // Tienda no encontrada en organigrama
+    inputs[4].value = 'SIN REGISTRO';
+    inputs[4].className = 'table-input';
+    inputs[4].style.color = '#999';
+}
+actualizarTotales();
         }
 
         function actualizarTotales() {
@@ -1313,8 +1312,8 @@
                 if (inputs.length >= 5) {
                     const cantidadFisica = parseFloat(inputs[3].value) || 0;
                     const tipo = inputs[4].value;
-                    if (tipo === 'DOMINO\'S') totalDominos += cantidadFisica;
-                    else if (tipo === 'STARBUCKS') totalStarbucks += cantidadFisica;
+                    if (tipo.includes('DOMINOS')) totalDominos += cantidadFisica;
+else if (tipo.includes('STARBUCKS')) totalStarbucks += cantidadFisica;
                 }
             });
             document.getElementById('totalDominos').textContent = Math.round(totalDominos);
@@ -1488,8 +1487,14 @@
                     }
                 });
 
-                const totalDominos = document.getElementById('totalDominos').textContent;
-                const totalStarbucks = document.getElementById('totalStarbucks').textContent;
+                // ✅ DESPUÉS
+const totalDominos = registros
+    .filter(r => r.tipo.includes('DOMINOS'))
+    .reduce((sum, r) => sum + r.cantidadFisica, 0);
+const totalStarbucks = registros
+    .filter(r => r.tipo.includes('STARBUCKS'))
+    .reduce((sum, r) => sum + r.cantidadFisica, 0);
+
 
                 const formularioCompleto = {
                     id: idUnico,
@@ -1564,3 +1569,4 @@
     </script>
 </body>
 </html>
+
